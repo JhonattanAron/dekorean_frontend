@@ -20,7 +20,7 @@ export default function ProductPage() {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const fetchedProduct = await getProductById(param.id);
+        const fetchedProduct = await getProductById(param.id as string);
         if (fetchedProduct) {
           setProduct(fetchedProduct);
         } else {
