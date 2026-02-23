@@ -133,7 +133,7 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       }
 
       // TODO: Replace with your actual API endpoint
-      const apiUrl = "https://api-dekorean.aurentric.com/";
+      const apiUrl = "https://api-dekorean.aurentric.com";
       const response = await fetch(`${apiUrl}/products?${queryParams}`);
 
       if (!response.ok) {
