@@ -79,7 +79,7 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const apiUrl = "http://localhost:8081";
+      const apiUrl = "http://localhost:8082";
 
       const response = await fetch(`${apiUrl}/products/${id}`);
 
