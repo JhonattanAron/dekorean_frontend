@@ -1,18 +1,18 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Cloud, ImagePlus } from 'lucide-react'
+import { useState } from "react";
+import { Cloud, ImagePlus } from "lucide-react";
 
 interface UploadBoxProps {
-  title: string
-  description: string
-  buttonText: string
+  title: string;
+  description: string;
+  buttonText: string;
   demoImages: Array<{
-    src: string
-    alt: string
-  }>
-  onUpload?: (files: FileList) => void
-  onDemoClick?: (index: number) => void
+    src: string;
+    alt: string;
+  }>;
+  onUpload?: (files: FileList) => void;
+  onDemoClick?: (index: number) => void;
 }
 
 export function UploadBox({
@@ -23,24 +23,24 @@ export function UploadBox({
   onUpload,
   onDemoClick,
 }: UploadBoxProps) {
-  const [isDragOver, setIsDragOver] = useState(false)
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(true)
-  }
+    e.preventDefault();
+    setIsDragOver(true);
+  };
 
   const handleDragLeave = () => {
-    setIsDragOver(false)
-  }
+    setIsDragOver(false);
+  };
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
+    e.preventDefault();
+    setIsDragOver(false);
     if (e.dataTransfer.files && onUpload) {
-      onUpload(e.dataTransfer.files)
+      onUpload(e.dataTransfer.files);
     }
-  }
+  };
 
   return (
     <div
@@ -67,12 +67,12 @@ export function UploadBox({
             type="file"
             className="hidden"
             accept="image/jpeg,image/png,image/heic"
-            onChange={(e) => onUpload?.(e.target.files)}
+            //onChange={(e) => onUpload?.(e.target.files)}
           />
           <button
             type="button"
             onClick={(e) => {
-              e.currentTarget.closest('label')?.querySelector('input[type="file"]')?.click?.()
+              //e.currentTarget.closest('label')?.querySelector('input[type="file"]')?.click?.()
             }}
             className="w-full bg-white text-background-dark font-bold py-4 rounded-lg shadow-lg hover:bg-white/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
@@ -84,8 +84,7 @@ export function UploadBox({
 
       {/* Divider */}
       <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-white/30 font-bold">
-        <span className="h-px w-8 bg-white/10"></span>
-        O utiliza una demo
+        <span className="h-px w-8 bg-white/10"></span>O utiliza una demo
         <span className="h-px w-8 bg-white/10"></span>
       </div>
 
@@ -100,12 +99,12 @@ export function UploadBox({
             tabIndex={0}
             onClick={() => onDemoClick?.(index)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') onDemoClick?.(index)
+              if (e.key === "Enter") onDemoClick?.(index);
             }}
             aria-label={image.alt}
           />
         ))}
       </div>
     </div>
-  )
+  );
 }
