@@ -48,6 +48,7 @@ interface ProductsStore {
 
 // Test data
 const testProducts: Product[] = [];
+const apiUrl = "https://api.dekorans.es";
 
 export const useProductsStore = create<ProductsStore>((set, get) => ({
   products: testProducts,
@@ -79,8 +80,6 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const apiUrl = "http://localhost:8082";
-
       const response = await fetch(`${apiUrl}/products/${id}`);
 
       if (!response.ok) {
@@ -132,8 +131,6 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
         queryParams.append("search", search);
       }
 
-      // TODO: Replace with your actual API endpoint
-      const apiUrl = "http://localhost:8082";
       const response = await fetch(`${apiUrl}/products?${queryParams}`);
 
       if (!response.ok) {
