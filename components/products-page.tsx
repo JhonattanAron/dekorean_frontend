@@ -1,9 +1,10 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import { Navbar } from '@/components/navbar'
-import { FooterImproved } from '@/components/footer-improved'
-import { ProductsGrid } from '@/components/products-grid'
+import Image from "next/image";
+import { Navbar } from "@/components/navbar";
+import { FooterImproved } from "@/components/footer-improved";
+import { ProductsGrid } from "@/components/products-grid";
+import { SearchBar } from "./product/seach-bar";
 
 const DekoransLogo = () => (
   <img
@@ -11,26 +12,30 @@ const DekoransLogo = () => (
     alt="DEKORANS Logo"
     className="w-8 h-8 object-contain"
   />
-)
+);
 
 export function ProductsPage() {
   const navLinks = [
-    { label: 'Productos', href: '/productos', active: true, id: 'nav-productos-prod' },
-    { label: 'Visor Interactivo', href: '/', id: 'nav-visor-prod' },
-    { label: 'Empresas', href: '#empresas', id: 'nav-empresas-prod' },
-    { label: 'Soporte', href: '#soporte', id: 'nav-soporte-prod' },
-  ]
+    {
+      label: "Productos",
+      href: "/productos",
+      active: true,
+      id: "nav-productos-prod",
+    },
+    { label: "Visor Interactivo", href: "/", id: "nav-visor-prod" },
+    { label: "Empresas", href: "#empresas", id: "nav-empresas-prod" },
+    { label: "Soporte", href: "#soporte", id: "nav-soporte-prod" },
+  ];
 
   return (
     <div className="min-h-screen bg-[#212129] flex flex-col">
       <Navbar
         links={navLinks}
-        logo={{ icon: <DekoransLogo />, text: 'DEKORANS' }}
+        logo={{ icon: <DekoransLogo />, text: "DEKORANS" }}
         userProfile={{
-          name: 'Juan Pérez',
-          plan: 'Pro Plan',
-          avatarUrl:
-            'https://lh3.googleusercontent.com/a/default-user=s40c',
+          name: "Juan Pérez",
+          plan: "Pro Plan",
+          avatarUrl: "https://lh3.googleusercontent.com/a/default-user=s40c",
         }}
       />
 
@@ -42,5 +47,5 @@ export function ProductsPage() {
 
       <FooterImproved />
     </div>
-  )
+  );
 }

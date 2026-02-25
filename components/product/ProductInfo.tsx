@@ -1,15 +1,16 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Heart, Share2, Check } from 'lucide-react'
+import { useState } from "react";
+import { Heart, Share2, Check } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface ProductInfoProps {
-  name: string
-  price: number
-  rating: number
-  reviewCount: number
-  inStock: boolean
-  description: string
+  name: string;
+  price: number;
+  rating: number;
+  reviewCount: number;
+  inStock: boolean;
+  description: string;
 }
 
 export function ProductInfo({
@@ -20,14 +21,14 @@ export function ProductInfo({
   inStock,
   description,
 }: ProductInfoProps) {
-  const [quantity, setQuantity] = useState(1)
-  const [isWishlisted, setIsWishlisted] = useState(false)
-  const [addedToCart, setAddedToCart] = useState(false)
+  const [quantity, setQuantity] = useState(1);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   const handleAddToCart = () => {
-    setAddedToCart(true)
-    setTimeout(() => setAddedToCart(false), 2000)
-  }
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -41,7 +42,7 @@ export function ProductInfo({
                 <span
                   key={i}
                   className={`text-lg ${
-                    i < Math.floor(rating) ? 'text-foreground' : 'text-muted'
+                    i < Math.floor(rating) ? "text-foreground" : "text-muted"
                   }`}
                 >
                   ★
@@ -57,7 +58,9 @@ export function ProductInfo({
 
       {/* Price */}
       <div className="border-b border-border pb-6">
-        <p className="text-3xl font-bold text-foreground">${price.toFixed(2)}</p>
+        <p className="text-3xl font-bold text-foreground">
+          ${price.toFixed(2)}
+        </p>
         <p className="text-sm text-muted-foreground mt-1">
           {inStock ? (
             <span className="text-green-600 flex items-center gap-1">
@@ -99,14 +102,10 @@ export function ProductInfo({
 
       {/* Action Buttons */}
       <div className="flex gap-3 pt-2">
-        <button
+        <Button
           onClick={handleAddToCart}
           disabled={!inStock || addedToCart}
-          className={`flex-1 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
-            addedToCart
-              ? 'bg-green-600 text-white'
-              : 'bg-foreground text-background hover:opacity-90'
-          } disabled:opacity-50 disabled:cursor-not-allowed`}
+          className="flex-1 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
         >
           {addedToCart ? (
             <>
@@ -114,9 +113,9 @@ export function ProductInfo({
               Added to Cart
             </>
           ) : (
-            'Add to Cart'
+            "Add to Cart"
           )}
-        </button>
+        </Button>
         <button
           onClick={() => setIsWishlisted(!isWishlisted)}
           className="px-4 py-3 rounded-lg border border-border hover:bg-secondary transition-colors"
@@ -125,8 +124,8 @@ export function ProductInfo({
           <Heart
             className={`w-5 h-5 ${
               isWishlisted
-                ? 'fill-destructive text-destructive'
-                : 'text-foreground'
+                ? "fill-destructive text-destructive"
+                : "text-foreground"
             }`}
           />
         </button>
@@ -150,5 +149,5 @@ export function ProductInfo({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -79,7 +79,7 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const apiUrl = "https://api-dekorean.aurentric.com";
+      const apiUrl = "http://localhost:8082";
 
       const response = await fetch(`${apiUrl}/products/${id}`);
 
@@ -133,7 +133,7 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       }
 
       // TODO: Replace with your actual API endpoint
-      const apiUrl = "https://api-dekorean.aurentric.com";
+      const apiUrl = "http://localhost:8082";
       const response = await fetch(`${apiUrl}/products?${queryParams}`);
 
       if (!response.ok) {
@@ -151,7 +151,6 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
         loading: false,
       });
     } catch (error) {
-      console.error("[v0] Error fetching products:", error);
       set({
         error: error instanceof Error ? error.message : "An error occurred",
         loading: false,

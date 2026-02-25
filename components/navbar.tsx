@@ -1,37 +1,64 @@
-'use client'
+"use client";
 
-import { ShoppingCart } from 'lucide-react'
-import { useCartStore } from '@/lib/cart-store'
+import { ShoppingCart } from "lucide-react";
+import { useCartStore } from "@/lib/cart-store";
+import { useState, useEffect } from "react";
 
 interface NavLink {
-  label: string
-  href: string
-  active?: boolean
+  label: string;
+  href: string;
+  active?: boolean;
 }
 
 interface NavbarProps {
-  links: NavLink[]
+  links: NavLink[];
   logo: {
-    icon: React.ReactNode
-    text: string
-  }
+    icon: React.ReactNode;
+    text: string;
+  };
   userProfile?: {
-    name: string
-    plan: string
-    avatarUrl: string
-  }
+    name: string;
+    plan: string;
+    avatarUrl: string;
+  };
 }
 
 export function Navbar({ links, logo, userProfile }: NavbarProps) {
-  const { items, toggleCart } = useCartStore()
+  const { items, toggleCart } = useCartStore();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="fixed top-4 left-4 right-4 z-50">
-      <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 backdrop-blur-xl border border-white/10 shadow-2xl">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled ? "top-0 py-2" : "top-4 py-0"
+      }`}
+    >
+      <nav
+        className={`mx-auto flex items-center justify-between px-6 rounded-2xl transition-all duration-500 ${
+          isScrolled
+            ? "py-3  bg-slate-700/95 border-white/5 shadow-xl "
+            : "py-4 mx-auto bg-gradient-to-b from-slate-900/90 to-slate-950/90 max-w-7xl border-white/10 shadow-2xl"
+        } backdrop-blur-xl border`}
+      >
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="text-primary">{logo.icon}</div>
-          <span className="text-xl font-bold tracking-tight text-white">{logo.text}</span>
+          <span
+            className={`font-bold tracking-tight text-white transition-all duration-500 ${
+              isScrolled ? "text-lg" : "text-xl"
+            }`}
+          >
+            {logo.text}
+          </span>
         </div>
 
         {/* Navigation Links */}
@@ -42,8 +69,8 @@ export function Navbar({ links, logo, userProfile }: NavbarProps) {
               href={link.href}
               className={`text-sm font-medium transition-colors ${
                 link.active
-                  ? 'text-primary underline underline-offset-8'
-                  : 'text-white/80 hover:text-white'
+                  ? "text-primary underline underline-offset-8"
+                  : "text-white/80 hover:text-white"
               }`}
             >
               {link.label}
@@ -71,7 +98,9 @@ export function Navbar({ links, logo, userProfile }: NavbarProps) {
           {userProfile && (
             <div className="flex items-center gap-3 pl-4 border-l border-white/10">
               <div className="text-right hidden sm:block">
-                <p className="text-xs font-semibold text-white">{userProfile.name}</p>
+                <p className="text-xs font-semibold text-white">
+                  {userProfile.name}
+                </p>
                 <p className="text-[10px] text-white/50">{userProfile.plan}</p>
               </div>
               <div
@@ -84,5 +113,5 @@ export function Navbar({ links, logo, userProfile }: NavbarProps) {
         </div>
       </nav>
     </header>
-  )
+  );
 }

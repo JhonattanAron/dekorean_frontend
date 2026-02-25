@@ -1,3 +1,4 @@
+import CategoryCarousel from "@/components/product/category-carrusel";
 import { ProductsPage } from "@/components/products-page";
 
 export const metadata = {
@@ -7,5 +8,11 @@ export const metadata = {
 };
 
 export default function ProductsRoute() {
-  return <ProductsPage />;
+  return (
+    <div>
+      <CategoryCarousel />
+
+      <ProductsPage />
+    </div>
+  );
 }

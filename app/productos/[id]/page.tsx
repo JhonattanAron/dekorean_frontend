@@ -135,6 +135,22 @@ export default function ProductPage() {
     );
   }
 
+  function VideoSection() {
+    return (
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-5xl aspect-video">
+          <iframe
+            className="w-full h-full rounded-xl"
+            src="https://www.youtube.com/embed/RO7FC59b1hY"
+            title="YouTube video player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <LayoutPage>
       <main className="min-h-screen bg-background">
@@ -167,172 +183,10 @@ export default function ProductPage() {
 
             {/* Sidebar */}
             <aside className="lg:col-span-1">
-              <div className="bg-secondary rounded-lg p-6 sticky top-24 space-y-4">
-                <h3 className="font-semibold text-foreground text-lg">
-                  Recommended For You
-                </h3>
-                <div className="space-y-3">
-                  <div className="pb-3 border-b border-border">
-                    <p className="text-sm font-medium text-foreground">
-                      Protective Case
-                    </p>
-                    <p className="text-xs text-muted-foreground">$29.99</p>
-                  </div>
-                  <div className="pb-3 border-b border-border">
-                    <p className="text-sm font-medium text-foreground">
-                      Screen Protector
-                    </p>
-                    <p className="text-xs text-muted-foreground">$14.99</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Charging Cable
-                    </p>
-                    <p className="text-xs text-muted-foreground">$19.99</p>
-                  </div>
-                </div>
-                <button className="w-full bg-foreground text-background rounded-lg py-2 font-medium hover:opacity-90 transition-opacity text-sm">
-                  View All Accessories
-                </button>
-              </div>
+              <VideoSection />
             </aside>
           </div>
         </section>
-
-        {/* Footer */}
-        <footer className="border-t border-border bg-secondary mt-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-              <div>
-                <h4 className="font-semibold text-foreground mb-4">About</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      About Us
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Careers
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Press
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-foreground mb-4">Support</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Help Center
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Contact Us
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Shipping Info
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-foreground mb-4">Legal</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Privacy
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Terms
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Cookies
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-foreground mb-4">Connect</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Twitter
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Instagram
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="hover:text-foreground transition-colors"
-                    >
-                      Facebook
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-              <p>&copy; 2024 ShopHub. All rights reserved.</p>
-              <div className="flex gap-4 mt-4 md:mt-0">
-                <button className="hover:text-foreground transition-colors">
-                  Security & Privacy
-                </button>
-                <button className="hover:text-foreground transition-colors">
-                  Report Issue
-                </button>
-              </div>
-            </div>
-          </div>
-        </footer>
       </main>
     </LayoutPage>
   );

@@ -11,6 +11,8 @@ import {
 import { useCartStore } from "@/lib/cart-store";
 import { useProductsStore } from "@/lib/products-store";
 import { useEffect, useState } from "react";
+import { SearchBar } from "./product/seach-bar";
+import { Button } from "./ui/button";
 
 function renderStars(rating: number = 5) {
   const stars = [];
@@ -56,7 +58,7 @@ export function ProductsGrid() {
       name: product.title,
       price: product.price || 120,
       quantity: 1,
-      image: product.mainImage,
+      image: product.images[0],
     });
 
     setAddedToCart(new Set([...addedToCart, product._id]));
@@ -94,6 +96,7 @@ export function ProductsGrid() {
           Page {page} of {totalPages}
         </div>
       </div>
+      <SearchBar />
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
@@ -172,17 +175,17 @@ export function ProductsGrid() {
                   </div>
 
                   {/* Add to Cart Button */}
-                  <button
+                  <Button
                     onClick={(e) => handleAddToCart(e, product)}
                     className={`w-full py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
                       addedToCart.has(product._id)
-                        ? "bg-foreground text-background"
-                        : "bg-foreground text-background hover:opacity-90"
+                        ? " text-background"
+                        : " text-background hover:opacity-90"
                     }`}
                   >
                     <ShoppingCart className="w-4 h-4" />
                     {addedToCart.has(product._id) ? "Added!" : "Add to Cart"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </Link>
