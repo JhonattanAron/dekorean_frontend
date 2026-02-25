@@ -22,7 +22,7 @@ export default function LayoutPage({
   ];
 
   return (
-    <div className="min-h-screen bg-[#212129] flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Navbar
         links={navLinks}
         logo={{ icon: <DekoransLogo />, text: "DEKORANS" }}
