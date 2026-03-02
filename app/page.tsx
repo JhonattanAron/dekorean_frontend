@@ -56,7 +56,7 @@ export default function Home() {
       />
 
       {/* Home Hero Section */}
-      <HomeHero demoImages={demoImages} />
+      <HomeHero />
 
       {/* Products Catalog Section */}
       <ProductsCatalog />

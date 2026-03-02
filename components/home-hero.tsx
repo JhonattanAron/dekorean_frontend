@@ -1,45 +1,49 @@
-'use client'
+"use client";
 
-import { Search } from 'lucide-react'
-import { UploadBox } from '@/components/upload-box'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { Search } from "lucide-react";
+import { UploadBox } from "@/components/upload-box";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface HomeHeroProps {
-  demoImages?: Array<{ src: string; alt: string }>
+  demoImages?: Array<{ src: string; alt: string }>;
 }
 
 export function HomeHero({ demoImages = [] }: HomeHeroProps) {
-  const router = useRouter()
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [selectedDemo, setSelectedDemo] = useState<number | null>(null)
+  const router = useRouter();
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [selectedDemo, setSelectedDemo] = useState<number | null>(null);
 
   const handleUpload = (files: FileList | null) => {
     if (files && files[0]) {
-      const file = files[0]
-      setUploadedFile(file)
-      
+      const file = files[0];
+      setUploadedFile(file);
+
       // Convert file to URL and redirect to visualizer
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = (e) => {
-        const imageUrl = e.target?.result as string
-        const encodedUrl = encodeURIComponent(imageUrl)
-        const encodedName = encodeURIComponent(file.name)
-        router.push(`/visualizer?imageUrl=${encodedUrl}&imageName=${encodedName}`)
-      }
-      reader.readAsDataURL(file)
+        const imageUrl = e.target?.result as string;
+        const encodedUrl = encodeURIComponent(imageUrl);
+        const encodedName = encodeURIComponent(file.name);
+        router.push(
+          `/visualizer?imageUrl=${encodedUrl}&imageName=${encodedName}`,
+        );
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleDemoClick = (index: number) => {
-    setSelectedDemo(index)
+    setSelectedDemo(index);
     // Redirect to visualizer with demo image
     if (demoImages[index]) {
-      const encodedUrl = encodeURIComponent(demoImages[index].src)
-      const encodedName = encodeURIComponent(`Demo ${index + 1}`)
-      router.push(`/visualizer?imageUrl=${encodedUrl}&imageName=${encodedName}`)
+      const encodedUrl = encodeURIComponent(demoImages[index].src);
+      const encodedName = encodeURIComponent(`Demo ${index + 1}`);
+      router.push(
+        `/visualizer?imageUrl=${encodedUrl}&imageName=${encodedName}`,
+      );
     }
-  }
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -62,7 +66,8 @@ export function HomeHero({ demoImages = [] }: HomeHeroProps) {
               innovadores
             </h1>
             <p className="text-lg md:text-xl text-white/70 max-w-lg leading-relaxed">
-              Arrastra y sube una foto de tu pared para aplicarle paneles a escala real y visualizar tu próximo proyecto.
+              Arrastra y sube una foto de tu pared para aplicarle paneles a
+              escala real y visualizar tu próximo proyecto.
             </p>
           </div>
 
@@ -92,11 +97,18 @@ export function HomeHero({ demoImages = [] }: HomeHeroProps) {
 
       {(uploadedFile || selectedDemo !== null) && (
         <div className="fixed bottom-20 left-6 z-50 bg-primary/20 backdrop-blur border border-primary/50 rounded-lg p-4 max-w-xs">
-          {uploadedFile && <p className="text-sm text-white">📁 Cargando: {uploadedFile.name}...</p>}
-          {selectedDemo !== null && <p className="text-sm text-white">🖼️ Abriendo demo #{selectedDemo + 1}...</p>}
+          {uploadedFile && (
+            <p className="text-sm text-white">
+              📁 Cargando: {uploadedFile.name}...
+            </p>
+          )}
+          {selectedDemo !== null && (
+            <p className="text-sm text-white">
+              🖼️ Abriendo demo #{selectedDemo + 1}...
+            </p>
+          )}
         </div>
       )}
     </section>
-  )
+  );
 }
-

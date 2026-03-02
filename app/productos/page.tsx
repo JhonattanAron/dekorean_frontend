@@ -11,7 +11,6 @@ export default function ProductsRoute() {
   return (
     <div>
       <CategoryCarousel />
-
       <ProductsPage />
     </div>
   );

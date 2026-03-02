@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../ui/button";
+import Link from "next/link";
+import { formatLink } from "@/lib/utils";
 
 const departments = [
   {
@@ -102,9 +104,12 @@ export default function CategoryCarousel() {
             {current.description}
           </p>
 
-          <Button className="mt-10 px-10 py-6 text-lg font-semibold rounded-lg bg-white text-black hover:bg-gray-200 transition-all transform hover:scale-105 shadow-xl">
+          <Link
+            href={`productos/categories/${formatLink(current.name)}`}
+            className="m-10 px-10 py-6 text-lg font-semibold rounded-lg bg-white text-black hover:bg-gray-200 transition-all transform hover:scale-105 shadow-xl"
+          >
             Explorar
-          </Button>
+          </Link>
         </div>
 
         {/* Navigation Buttons */}

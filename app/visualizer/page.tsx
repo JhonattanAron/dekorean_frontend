@@ -1,32 +1,22 @@
-'use client'
+"use client";
 
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { Visualizer } from '@/components/visualizer'
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { Visualizer } from "@/components/visualizer";
 
 function VisualizerContent() {
-  const searchParams = useSearchParams()
-  const imageUrl = searchParams.get('imageUrl')
-  const imageName = searchParams.get('imageName')
+  const searchParams = useSearchParams();
+  const imageUrl = searchParams.get("imageUrl");
+  const imageName = searchParams.get("imageName");
 
-  if (!imageUrl) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background-dark">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">No se encontró imagen</h1>
-          <p className="text-slate-400 mb-6">Por favor, sube una imagen desde el home para visualizarla.</p>
-          <a
-            href="/"
-            className="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-all"
-          >
-            Volver al Home
-          </a>
-        </div>
-      </div>
-    )
-  }
-
-  return <Visualizer imageUrl={imageUrl} imageName={imageName || 'Imagen cargada'} />
+  return (
+    <Visualizer
+      imageUrl={
+        "https://www.viacelere.com/wp-content/uploads/old-blog/2017/10/tipos-de-cocina_opt.jpg"
+      }
+      imageName={imageName || "Imagen cargada"}
+    />
+  );
 }
 
 export default function VisualizerPage() {
@@ -40,5 +30,5 @@ export default function VisualizerPage() {
     >
       <VisualizerContent />
     </Suspense>
-  )
+  );
 }

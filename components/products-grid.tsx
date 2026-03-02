@@ -13,6 +13,8 @@ import { useProductsStore } from "@/lib/products-store";
 import { useEffect, useState } from "react";
 import { SearchBar } from "./product/seach-bar";
 import { Button } from "./ui/button";
+import { useParams } from "next/navigation";
+import { formatLink } from "@/lib/utils";
 
 function renderStars(rating: number = 5) {
   const stars = [];
@@ -28,6 +30,7 @@ export function ProductsGrid() {
     useProductsStore();
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [addedToCart, setAddedToCart] = useState<Set<string>>(new Set());
+  const param = useParams();
 
   useEffect(() => {
     fetchProducts(1, 12);
@@ -86,7 +89,9 @@ export function ProductsGrid() {
       <div className="mb-12 flex justify-between items-end">
         <div>
           <h1 className="text-5xl font-bold text-foreground">
-            Premium Collection
+            {!param.category
+              ? "Premium Collection"
+              : `Explora nuestra Coleccion de ${formatLink(param.category as string)}`}
           </h1>
           <p className="text-muted-foreground text-sm mt-2">
             Discover our curated selection of premium products
@@ -108,8 +113,8 @@ export function ProductsGrid() {
             </div>
           </div>
         ) : products.length > 0 ? (
-          products.map((product) => (
-            <Link key={product._id} href={`/productos/${product._id}`}>
+          products.map((product, index) => (
+            <Link key={index} href={`/productos/${formatLink(product.title)}`}>
               <div className="group flex flex-col h-full rounded-lg overflow-hidden border border-border hover:border-foreground transition-all duration-300 bg-card hover:shadow-lg hover:shadow-foreground/5">
                 {/* Image Container */}
                 <div className="relative overflow-hidden bg-secondary aspect-square">
@@ -170,7 +175,7 @@ export function ProductsGrid() {
                   {/* Price */}
                   <div className="mb-4">
                     <p className="text-2xl font-bold text-foreground">
-                      ${(product.price || 120).toFixed(2)}
+                      ${product.price}
                     </p>
                   </div>
 

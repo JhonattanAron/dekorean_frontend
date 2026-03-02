@@ -1,5 +1,9 @@
+"use client";
+
 import { Navbar } from "@/components/navbar";
 import { FooterImproved } from "@/components/footer-improved";
+import { AnimatePresence, motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 const DekoransLogo = () => (
   <img
@@ -14,6 +18,8 @@ export default function LayoutPage({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   const navLinks = [
     { label: "Productos", href: "/productos", active: true },
     { label: "Visor Interactivo", href: "/" },
@@ -33,7 +39,19 @@ export default function LayoutPage({
         }}
       />
 
-      <main className="flex-1 pt-24">{children}</main>
+      <main className="flex-1 pt-24 overflow-hidden relative">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            transition={{ duration: 0.4 }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      </main>
 
       <FooterImproved />
     </div>

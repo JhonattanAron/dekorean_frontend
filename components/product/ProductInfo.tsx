@@ -58,9 +58,7 @@ export function ProductInfo({
 
       {/* Price */}
       <div className="border-b border-border pb-6">
-        <p className="text-3xl font-bold text-foreground">
-          ${price.toFixed(2)}
-        </p>
+        <p className="text-3xl font-bold text-foreground">${price}</p>
         <p className="text-sm text-muted-foreground mt-1">
           {inStock ? (
             <span className="text-green-600 flex items-center gap-1">

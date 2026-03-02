@@ -11,8 +11,8 @@ const config: Config = {
       colors: {
         // Colores principales
         primary: "#1754cf", // azul para botones y enlaces
-        secondary: "#facc15", // amarillo/acento
-        accent: "#f97316", // naranja/acento extra
+        secondary: "788bff", // amarillo/acento
+        accent: "#788bff", // naranja/acento extra
 
         // Fondos
         "background-light": "#f6f6f8", // fondo en modo claro

@@ -11,7 +11,7 @@ export function parseProductString(input: string) {
 
   if (matches.length < 3 || matches.length > 4) {
     throw new Error(
-      "Formato inválido. Se esperaban 3 o 4 valores entre llaves."
+      "Formato inválido. Se esperaban 3 o 4 valores entre llaves.",
     );
   }
 
@@ -32,4 +32,30 @@ export function parseProductString(input: string) {
     description,
     stock,
   };
+}
+
+export function formatLink(text: string): string {
+  if (!text) return "";
+
+  // 🔥 Siempre decodificar primero
+  const decoded = decodeURIComponent(text);
+
+  // Detectar si ya parece slug (minúsculas y guiones)
+  const isSlug = /^[a-z0-9-]+$/.test(decoded);
+
+  // 🔹 Si es slug → convertir a texto bonito
+  if (isSlug) {
+    return decoded
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
+  // 🔹 Si es texto normal → convertir a slug
+  return decoded
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
 }
