@@ -2,8 +2,8 @@
 
 import { cookies } from "next/headers";
 
-const ADMIN_USER = "admin";
-const ADMIN_PASSWORD = "123456";
+const ADMIN_USER = "admin@dekorans";
+const ADMIN_PASSWORD = "Dek0ransSecure!";
 
 export async function login(username: string, password: string) {
   if (username === ADMIN_USER && password === ADMIN_PASSWORD) {
