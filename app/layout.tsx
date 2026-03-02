@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description:
     "Personaliza tu espacio con paneles innovadores. Arrastra y sube una foto de tu pared para visualizar a escala real.",
   icons: {
-    icon: "favicon.png",
+    icon: "/images/dekorans-icon.png",
   },
 };
 
