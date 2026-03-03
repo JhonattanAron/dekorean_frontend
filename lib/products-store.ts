@@ -48,7 +48,7 @@ interface ProductsStore {
 
 // Test data
 const testProducts: Product[] = [];
-const apiUrl = "http://localhost:8082";
+const apiUrl = "https://api.dekorans.es";
 
 export const useProductsStore = create<ProductsStore>((set, get) => ({
   products: testProducts,
