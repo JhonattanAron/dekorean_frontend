@@ -2,25 +2,61 @@
 
 import { create } from "zustand";
 
+// Sub-interfaces basadas en tus sub-schemas
+
+export interface Description {
+  general: string;
+  highlights: string[];
+  installation: string;
+  installationSteps: string[];
+  overview: string;
+  purchaseInstructions: string;
+}
+
+export interface Price {
+  original: number;
+  current: number;
+  currency: string;
+}
+
+export interface Reviews {
+  rating: number;
+  count: number;
+}
+
+// Interface principal del producto
+
 export interface Product {
   _id: string;
-  externalId: string;
-  title: string;
-  description: string;
-  specifications: string;
+
+  brand: string;
+  category: string[];
+  claims: string[];
+
+  contentSize: string;
+  deliveryTime: string;
+
+  description?: Description;
+
+  dimensions?: Record<string, any>;
+
+  features: string[];
   images: string[];
   mainImage: string;
-  sourceUrl: string;
-  videoUrl: string;
+
+  inStock: boolean;
+  stock?: number;
+
+  price?: Price;
+  price_per_m2: number;
+
+  reviews?: Reviews;
+
+  slug: string;
+  title: string;
+
   createdAt: string;
   updatedAt: string;
-  price?: number;
-  rating?: number;
-  reviews?: number;
-  badge?: string;
-  badgeColor?: string;
-  color?: string;
-  material?: string;
 }
 
 interface ProductsStore {
@@ -48,7 +84,7 @@ interface ProductsStore {
 
 // Test data
 const testProducts: Product[] = [];
-const apiUrl = "https://api.dekorans.es";
+const apiUrl = "/api/backend"; // Cambia esto a tu URL real del backend
 
 export const useProductsStore = create<ProductsStore>((set, get) => ({
   products: testProducts,
@@ -80,7 +116,7 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const response = await fetch(`${apiUrl}/products/${id}`);
+      const response = await fetch(`${apiUrl}/products/name/${id}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch product");
@@ -112,11 +148,8 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
   searchProducts: (query: string) => {
     const state = get();
     const lowerQuery = query.toLowerCase();
-    return state.products.filter(
-      (p) =>
-        p.title.toLowerCase().includes(lowerQuery) ||
-        p.description.toLowerCase().includes(lowerQuery) ||
-        p.specifications.toLowerCase().includes(lowerQuery),
+    return state.products.filter((p) =>
+      p.title.toLowerCase().includes(lowerQuery),
     );
   },
 

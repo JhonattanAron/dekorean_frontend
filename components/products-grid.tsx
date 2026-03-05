@@ -15,6 +15,7 @@ import { SearchBar } from "./product/seach-bar";
 import { Button } from "./ui/button";
 import { useParams } from "next/navigation";
 import { formatLink } from "@/lib/utils";
+import { SearchModal } from "./search-modal";
 
 function renderStars(rating: number = 5) {
   const stars = [];
@@ -59,7 +60,7 @@ export function ProductsGrid() {
     addItem({
       id: product._id,
       name: product.title,
-      price: product.price || 120,
+      price: product.price?.current || 120,
       quantity: 1,
       image: product.images[0],
     });
@@ -88,12 +89,12 @@ export function ProductsGrid() {
       {/* Header */}
       <div className="mb-12 flex justify-between items-end">
         <div>
-          <h1 className="text-5xl font-bold text-foreground">
+          <h1 className="text-5xl font-bold text-white">
             {!param.category
               ? "Premium Collection"
               : `Explora nuestra Coleccion de ${formatLink(param.category as string)}`}
           </h1>
-          <p className="text-muted-foreground text-sm mt-2">
+          <p className="text-muted-foreground text-sm mt-2 text-white">
             Discover our curated selection of premium products
           </p>
         </div>
@@ -101,7 +102,7 @@ export function ProductsGrid() {
           Page {page} of {totalPages}
         </div>
       </div>
-      <SearchBar />
+      <SearchModal />
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
@@ -114,83 +115,82 @@ export function ProductsGrid() {
           </div>
         ) : products.length > 0 ? (
           products.map((product, index) => (
-            <Link key={index} href={`/productos/${formatLink(product.title)}`}>
-              <div className="group flex flex-col h-full rounded-lg overflow-hidden border border-border hover:border-foreground transition-all duration-300 bg-card hover:shadow-lg hover:shadow-foreground/5">
-                {/* Image Container */}
-                <div className="relative overflow-hidden bg-secondary aspect-square">
+            <Link key={product._id} href={`/productos/${product.slug}`}>
+              <div className="glass rounded-xl overflow-hidden group hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 flex flex-col border border-white/5 cursor-pointer h-full backdrop-blur-md bg-card/60">
+                {/* Image */}
+                <div className="relative aspect-square overflow-hidden bg-slate-900">
                   <img
-                    src={product.images?.[0]}
                     alt={product.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    src={product.images?.[0] || "/placeholder.jpg"}
                   />
 
-                  {/* Badge */}
-                  {product.badge && (
-                    <div className="absolute top-4 left-4 bg-foreground text-background px-3 py-1 rounded-full text-xs font-semibold">
-                      {product.badge}
+                  {/* Badge dinámico */}
+                  {product.inStock === false && (
+                    <div className="absolute top-3 right-3 glass px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-white/10">
+                      <span className="text-red-400">Agotado</span>
                     </div>
                   )}
 
-                  {/* Wishlist Button */}
-                  <button
-                    onClick={(e) => toggleWishlist(e, product._id)}
-                    className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm p-2 rounded-full hover:bg-background transition-all opacity-0 group-hover:opacity-100"
-                  >
-                    <Heart
-                      className={`w-5 h-5 transition-all ${
-                        wishlist.has(product._id)
-                          ? "fill-destructive text-destructive"
-                          : "text-foreground"
-                      }`}
-                    />
-                  </button>
+                  {product.price?.original &&
+                    product.price.original > product.price.current && (
+                      <div className="absolute top-3 left-3 glass px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-white/10">
+                        <span className="text-green-400">Oferta</span>
+                      </div>
+                    )}
                 </div>
 
                 {/* Content */}
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="text-base font-semibold text-foreground mb-3 line-clamp-2 group-hover:text-foreground transition-colors">
+                <div className="p-5 flex flex-col flex-1">
+                  {/* Title */}
+                  <h3 className="text-base font-semibold mb-2 group-hover:text-gray-300 transition-colors line-clamp-2 text-white">
                     {product.title}
                   </h3>
 
                   {/* Rating */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex gap-1">
-                      {renderStars(product.rating || 5).map((star, i) => (
+                  <div className="flex items-center gap-1 mb-4 text-white">
+                    {renderStars(product.reviews?.rating || 0).map(
+                      (star, i) => (
                         <Star
                           key={i}
-                          className="w-4 h-4 fill-foreground text-foreground"
+                          className={`w-4 h-4 ${
+                            star === "full"
+                              ? "fill-white text-white"
+                              : star === "half"
+                                ? "fill-white text-white opacity-50"
+                                : "text-slate-700"
+                          }`}
                         />
-                      ))}
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      ({product.reviews || 0})
+                      ),
+                    )}
+
+                    <span className="text-[10px] text-slate-500 ml-2">
+                      ({product.reviews?.count || 0})
                     </span>
                   </div>
 
-                  {/* Description snippet */}
-                  <p className="text-xs text-muted-foreground mb-4 line-clamp-2 flex-1">
-                    {product.description || "Premium quality product"}
-                  </p>
-
                   {/* Price */}
-                  <div className="mb-4">
-                    <p className="text-2xl font-bold text-foreground">
-                      ${product.price}
+                  <div className="mt-auto mb-4">
+                    {product.price?.original &&
+                      product.price.original > product.price.current && (
+                        <p className="text-xs line-through ">
+                          ${product.price.original.toLocaleString("es-ES")}
+                        </p>
+                      )}
+
+                    <p className="text-2xl font-bold text-white">
+                      ${product.price?.current?.toLocaleString("es-ES")}
                     </p>
                   </div>
 
-                  {/* Add to Cart Button */}
-                  <Button
+                  {/* Button */}
+                  <button
                     onClick={(e) => handleAddToCart(e, product)}
-                    className={`w-full py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
-                      addedToCart.has(product._id)
-                        ? " text-background"
-                        : " text-background hover:opacity-90"
-                    }`}
+                    className="w-full bg-white hover:bg-slate-100 text-slate-900 py-3 rounded-lg text-sm font-bold transition-all transform active:scale-95 flex items-center justify-center gap-2 shadow-lg"
                   >
                     <ShoppingCart className="w-4 h-4" />
-                    {addedToCart.has(product._id) ? "Added!" : "Add to Cart"}
-                  </Button>
+                    Agregar
+                  </button>
                 </div>
               </div>
             </Link>

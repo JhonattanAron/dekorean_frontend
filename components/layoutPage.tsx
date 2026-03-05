@@ -39,8 +39,8 @@ export default function LayoutPage({
         }}
       />
 
-      <main className="flex-1 pt-24 overflow-hidden relative">
-        <AnimatePresence mode="wait" initial={false}>
+      <main className="flex-1 overflow-hidden relative">
+        <AnimatePresence mode="wait">
           <motion.div
             key={pathname}
             initial={{ opacity: 0, y: 40 }}

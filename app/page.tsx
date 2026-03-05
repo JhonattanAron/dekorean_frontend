@@ -10,6 +10,7 @@ import { WhyChooseUs } from "@/components/why-choose-us";
 import { FinalCTA } from "@/components/final-cta";
 
 import Image from "next/image";
+import LayoutPage from "@/components/layoutPage";
 
 const DekoransLogo = () => (
   <img
@@ -43,18 +44,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark">
-      <Navbar
-        links={navLinks}
-        logo={{ icon: <DekoransLogo />, text: "DEKORANS" }}
-        userProfile={{
-          name: "Aron Cachago",
-          plan: "Pro Plan",
-          avatarUrl:
-            "https://lh3.googleusercontent.com/aida-public/AB6AXuBvqYBy9nDJkjJAwL8MmPQ2TcvfV6F6rTXUBozIMz6W6KYgI-SfKAOVGrc2yrZdckSDPuSSzzB2oXtfPeTndpMw6yAlWJ4gQhJnvhLIeg1caMogFkHy0iyQq68PcFZYT0O1Bc0Lw3bvzXeeo4dcYwMBCjw8aaRDOtBvcmqVU0S-bWrdXtzfKaxbkVoWxfTNeiJ-rLgq9-5woR70ds_ZDqRv1Qjf1MF4mvaUqkMLzX1w3P3cN8G-ZTBDevYr2Md49trAjwupiaTz8g",
-        }}
-      />
-
+    <LayoutPage>
       {/* Home Hero Section */}
       <HomeHero />
 
@@ -72,9 +62,6 @@ export default function Home() {
 
       {/* Final CTA Section */}
       <FinalCTA />
-
-      {/* Footer */}
-      <FooterImproved />
-    </div>
+    </LayoutPage>
   );
 }

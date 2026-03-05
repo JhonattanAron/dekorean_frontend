@@ -23,7 +23,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Main Image */}
-      <div className="relative bg-secondary rounded-lg overflow-hidden aspect-square group">
+      <div className="relative   rounded-lg overflow-hidden aspect-square group">
         <img
           src={images[selectedIndex]}
           alt={`${productName} view ${selectedIndex + 1}`}

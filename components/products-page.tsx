@@ -1,10 +1,5 @@
 "use client";
-
-import Image from "next/image";
-import { Navbar } from "@/components/navbar";
-import { FooterImproved } from "@/components/footer-improved";
-import { ProductsGrid } from "@/components/products-grid";
-import { SearchBar } from "./product/seach-bar";
+import { ProductsGrid } from "./products-grid";
 
 const DekoransLogo = () => (
   <img
@@ -29,23 +24,11 @@ export function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-[#212129] flex flex-col">
-      <Navbar
-        links={navLinks}
-        logo={{ icon: <DekoransLogo />, text: "DEKORANS" }}
-        userProfile={{
-          name: "Juan Pérez",
-          plan: "Pro Plan",
-          avatarUrl: "https://lh3.googleusercontent.com/a/default-user=s40c",
-        }}
-      />
-
       <main className="flex-1 pt-24">
         <div className="max-w-[1600px] mx-auto p-6 lg:p-8">
           <ProductsGrid />
         </div>
       </main>
-
-      <FooterImproved />
     </div>
   );
 }

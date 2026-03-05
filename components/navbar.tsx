@@ -3,6 +3,8 @@
 import { ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { ThemeToggle } from "./theme-toggle";
 
 interface NavLink {
   label: string;
@@ -50,7 +52,7 @@ export function Navbar({ links, logo, userProfile }: NavbarProps) {
         } backdrop-blur-xl border`}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3">
+        <Link href={"/"} className="flex items-center gap-3">
           <div className="text-primary">{logo.icon}</div>
           <span
             className={`font-bold tracking-tight text-white transition-all duration-500 ${
@@ -59,34 +61,33 @@ export function Navbar({ links, logo, userProfile }: NavbarProps) {
           >
             {logo.text}
           </span>
-        </div>
+        </Link>
 
         {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
           {links.map((link, index) => (
-            <a
+            <Link
               key={`${link.label}-${index}`}
               href={link.href}
-              className={`text-sm font-medium transition-colors ${
-                link.active
-                  ? "text-primary underline underline-offset-8"
-                  : "text-white/80 hover:text-white"
-              }`}
+              className={`text-sm font-medium transition-colors ${"text-white/80 hover:text-white"}`}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 
-        {/* Right Section: Cart + User Profile */}
-        <div className="flex items-center gap-6">
+        {/* Right Section: Cart + Theme + User Profile */}
+        <div className="flex items-center gap-4">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {/* Cart Button */}
           <button
             onClick={toggleCart}
-            className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
+            className="relative p-2 rounded-lg hover:bg-white/5 dark:hover:bg-coffee-900 transition-colors"
             aria-label="Carrito de compras"
           >
-            <ShoppingCart className="w-5 h-5 text-white/80 hover:text-primary transition-colors" />
+            <ShoppingCart className="w-5 h-5 text-white/80 dark:text-coffee-300 hover:text-primary dark:hover:text-coffee-400 transition-colors" />
             {items.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-primary text-slate-900 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                 {items.length}

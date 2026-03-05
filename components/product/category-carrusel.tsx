@@ -126,24 +126,24 @@ export default function CategoryCarousel() {
         >
           <ChevronRight className="w-8 h-8" />
         </button>
+        <div className="py-8 flex  items-center justify-center gap-3 flex-wrap">
+          {departments.map((dept, index) => (
+            <Button
+              key={dept.id}
+              onClick={() => goToSlide(index)}
+              className={`px-5 py-2 rounded-full text-white font-medium transition-all transform hover:scale-110 ${
+                index === currentIndex
+                  ? " scale-110"
+                  : "bg-muted hover:bg-secondary"
+              }`}
+            >
+              {dept.name}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Indicators */}
-      <div className="bg-background py-8 flex items-center justify-center gap-3 flex-wrap">
-        {departments.map((dept, index) => (
-          <Button
-            key={dept.id}
-            onClick={() => goToSlide(index)}
-            className={`px-5 py-2 rounded-full font-medium transition-all transform hover:scale-110 ${
-              index === currentIndex
-                ? "bg-primary text-primary-foreground scale-110"
-                : "bg-muted text-muted-foreground hover:bg-secondary"
-            }`}
-          >
-            {dept.name}
-          </Button>
-        ))}
-      </div>
     </div>
   );
 }

@@ -101,14 +101,6 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
             {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
           </Button>
         </form>
-
-        {/* Footer */}
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          ¿No tienes cuenta?{" "}
-          <button onClick={onClose} className="text-primary hover:underline">
-            Regístrate aquí
-          </button>
-        </p>
       </div>
     </div>
   );

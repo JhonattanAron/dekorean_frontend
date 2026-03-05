@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, ChangeEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import AdminLayout from "@/components/admin/admin-layout";
@@ -21,19 +21,50 @@ type Product = {
 
 export default function EditProduct() {
   const router = useRouter();
+  const params = useParams();
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const params = useParams();
+  const [uploading, setUploading] = useState(false);
 
-  // Cargar producto
+  async function handleDownload() {
+    if (!selectedImage) return;
+
+    const encodedUrl = encodeURIComponent(selectedImage);
+
+    // Esto llama a tu backend que genera la URL firmada
+    const res = await fetch(
+      `http://localhost:8082/storage/download?url=${encodedUrl}`,
+    );
+
+    if (!res.ok) {
+      alert("Error al obtener la URL de descarga");
+      return;
+    }
+
+    const blob = await res.blob(); // obtenemos el contenido de la imagen
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = blobUrl;
+
+    // Generar nombre de archivo a partir de la URL original
+    const fileName = selectedImage.split("/").pop() || "imagen.jpg";
+    a.download = fileName;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(blobUrl);
+  }
+  // 🔹 Cargar producto
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const res = await fetch(
-          `https://api.dekorans.es/products/${params.id}`,
-        );
+        const res = await fetch(`http://localhost:8082/products/${params.id}`);
         const data = await res.json();
         setProduct(data);
         setSelectedImage(data.images?.[0] || null);
@@ -46,23 +77,20 @@ export default function EditProduct() {
     fetchProduct();
   }, [params.id]);
 
-  // Guardar cambios
+  // 🔹 Guardar cambios
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!product) return;
 
     setSaving(true);
     try {
-      const res = await fetch(
-        `https://api.dekorans.es/products/${product._id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(product),
+      const res = await fetch(`http://localhost:8082/products/${product._id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(product),
+      });
 
       if (!res.ok) throw new Error(await res.text());
 
@@ -76,21 +104,134 @@ export default function EditProduct() {
     }
   }
 
+  // 🔹 Subir nueva imagen
+  async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files || !product) return;
+
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setUploading(true);
+
+    try {
+      // 🔹 Subir al storage
+      const uploadRes = await fetch("http://localhost:8082/storage/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) throw new Error("Error al subir imagen");
+
+      const data = await uploadRes.json();
+      const imageUrl = data.url;
+
+      // 🔹 Actualizar producto local
+      const updatedImages = [...(product.images || []), imageUrl];
+
+      const updatedProduct = {
+        ...product,
+        images: updatedImages,
+        mainImage: product.mainImage || imageUrl,
+      };
+
+      setProduct(updatedProduct);
+      setSelectedImage(imageUrl);
+
+      // 🔹 PATCH inmediato SOLO imágenes
+      const patchRes = await fetch(
+        `http://localhost:8082/products/${product._id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            images: updatedImages,
+            mainImage: updatedProduct.mainImage,
+          }),
+        },
+      );
+
+      if (!patchRes.ok) throw new Error("Error guardando referencia");
+    } catch (error) {
+      console.error("Error subiendo imagen:", error);
+      alert("Error al subir imagen");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  // 🔹 Reemplazar imagen seleccionada
+  async function handleReplace(e: ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files || !product || !selectedImage) return;
+
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setUploading(true);
+
+    try {
+      // 🔹 Subir nueva imagen
+      const uploadRes = await fetch("http://localhost:8082/storage/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) throw new Error("Error al subir imagen");
+
+      const data = await uploadRes.json();
+      const newUrl = data.url;
+
+      // 🔹 Reemplazar en array
+      const updatedImages =
+        product.images?.map((img) => (img === selectedImage ? newUrl : img)) ||
+        [];
+
+      const updatedProduct = {
+        ...product,
+        images: updatedImages,
+        mainImage:
+          product.mainImage === selectedImage ? newUrl : product.mainImage,
+      };
+
+      setProduct(updatedProduct);
+      setSelectedImage(newUrl);
+
+      // 🔹 PATCH inmediato
+      const patchRes = await fetch(
+        `http://localhost:8082/products/${product._id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            images: updatedImages,
+            mainImage: updatedProduct.mainImage,
+          }),
+        },
+      );
+
+      if (!patchRes.ok) throw new Error("Error guardando referencia");
+    } catch (error) {
+      console.error("Error reemplazando imagen:", error);
+      alert("Error al reemplazar imagen");
+    } finally {
+      setUploading(false);
+    }
+  }
+
   if (loading) return <p>Cargando producto...</p>;
   if (!product) return <p>Producto no encontrado</p>;
 
   return (
     <AdminLayout>
       <div className="flex gap-6 p-4">
-        {/* Formulario de edición */}
+        {/* FORMULARIO */}
         <form onSubmit={handleSubmit} className="flex-1 space-y-4 max-w-lg">
           <h1 className="text-2xl font-semibold">Editar Producto</h1>
 
           <div>
-            <label className="block mb-1">Título</label>
+            <label>Título</label>
             <Input
-              type="text"
-              className="w-full border rounded p-2"
               value={product.title}
               onChange={(e) =>
                 setProduct({ ...product, title: e.target.value })
@@ -100,48 +241,11 @@ export default function EditProduct() {
           </div>
 
           <div>
-            <label className="block mb-1">Descripción</label>
+            <label>Descripción</label>
             <Textarea
-              className="w-full border rounded p-2"
               value={product.description || ""}
               onChange={(e) =>
                 setProduct({ ...product, description: e.target.value })
-              }
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1">Imagen principal</label>
-            <Input
-              type="text"
-              className="w-full border rounded p-2"
-              value={product.mainImage || ""}
-              onChange={(e) =>
-                setProduct({ ...product, mainImage: e.target.value })
-              }
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1">Especificaciones</label>
-            <Input
-              type="text"
-              className="w-full border rounded p-2"
-              value={product.specifications || ""}
-              onChange={(e) =>
-                setProduct({ ...product, specifications: e.target.value })
-              }
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1">Video (URL)</label>
-            <Input
-              type="url"
-              className="w-full border rounded p-2"
-              value={product.videoUrl || ""}
-              onChange={(e) =>
-                setProduct({ ...product, videoUrl: e.target.value })
               }
             />
           </div>
@@ -151,31 +255,44 @@ export default function EditProduct() {
           </Button>
         </form>
 
-        {/* Visualizador de imágenes */}
+        {/* IMÁGENES */}
         <div className="flex-1 flex flex-col gap-4">
           {selectedImage && (
-            <div className="border rounded p-2 flex flex-col items-center">
-              <img
-                src={selectedImage}
-                alt="Imagen seleccionada"
-                className="max-h-96 object-contain"
-              />
-              <a
-                href={selectedImage}
-                download
-                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
+            <div className="border rounded p-4 flex flex-col items-center gap-2">
+              <img src={selectedImage} className="max-h-96 object-contain" />
+
+              <Button type="button" onClick={handleDownload}>
                 Descargar
-              </a>
+              </Button>
+              <label className="cursor-pointer px-4 py-2 bg-yellow-500 text-white rounded">
+                {uploading ? "Subiendo..." : "Reemplazar imagen"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleReplace}
+                />
+              </label>
             </div>
           )}
 
-          <div className="flex flex-wrap gap-2 mt-4">
+          {/* Subir nueva */}
+          <label className="cursor-pointer px-4 py-2 bg-green-600 text-white rounded w-fit">
+            {uploading ? "Subiendo..." : "Agregar nueva imagen"}
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleUpload}
+            />
+          </label>
+
+          {/* Galería */}
+          <div className="flex flex-wrap gap-2">
             {product.images?.map((img, idx) => (
               <img
                 key={idx}
                 src={img}
-                alt={`Imagen ${idx + 1}`}
                 className={`w-20 h-20 object-cover rounded cursor-pointer border ${
                   img === selectedImage ? "border-blue-500" : "border-gray-300"
                 }`}

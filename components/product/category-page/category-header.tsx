@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { formatLink } from "@/lib/utils";
+import { motion } from "framer-motion";
+import FlechaFlotante from "./flecha-flotante";
 
 const departments = [
   {
@@ -64,48 +66,95 @@ export default function CategoryHeader() {
 
   return (
     <header
-      className="relative mx-10 rounded-lg shadow-2xl h-screen md:h-[50vh] flex items-center justify-center overflow-hidden bg-cover bg-center"
+      className="relative  rounded-3xl shadow-2xl h-[85vh] md:h-[65vh] flex items-center justify-center overflow-hidden bg-cover bg-center"
       style={{
         backgroundImage: `url(${currentDepartment?.image})`,
       }}
     >
-      {/* Overlay oscuro para que el texto sea legible */}
-      <div className="absolute inset-0 bg-black/60" />
+      {/* Animated Gradient Overlay */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.2 }}
+        className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/40"
+      />
 
-      <div className="relative w-full px-4 md:px-8 max-w-7xl mx-auto">
-        {/* Header text */}
-        <div className="text-center mb-12 md:mb-16 z-10">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
-            Te Encuentras en
-            <br />
-            {params.category && formatLink(params.category as string)}
-          </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">
-            {currentDepartment?.description}
-          </p>
-        </div>
+      {/* Glow blobs */}
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute -top-32 -left-32 w-96 h-96 bg-primary/40 rounded-full blur-3xl"
+      />
 
-        {/* Categories */}
-        <div className="flex gap-3 md:gap-4 overflow-x-auto pb-4 justify-center flex-wrap">
-          {departments.map((category) => (
-            <Link
-              href={`${formatLink(category.name)}`}
-              key={category.id}
-              className={`flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold whitespace-nowrap transition-all duration-300 text-base md:text-lg ${
-                activeCategory === category.id
-                  ? "bg-white text-black shadow-lg scale-105"
-                  : "bg-white/20 text-white hover:bg-white/40"
-              }`}
-            >
-              <span className="text-xl md:text-2xl">{category.icon}</span>
-              {category.name}
-              {activeCategory === category.id && (
-                <ChevronRight className="w-5 h-5 md:w-6 md:h-6 ml-1" />
-              )}
-            </Link>
-          ))}
-        </div>
+      <motion.div
+        animate={{
+          scale: [1, 1.15, 1],
+          opacity: [0.2, 0.4, 0.2],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/40 rounded-full blur-3xl"
+      />
+
+      {/* Content */}
+      <div className="relative z-10 text-center px-6 max-w-4xl">
+        <motion.p
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 0.8, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="uppercase tracking-[0.3em] text-sm text-white/70 mb-4"
+        >
+          Departamento
+        </motion.p>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 1 }}
+          className="text-4xl md:text-6xl font-extrabold text-white leading-tight"
+        >
+          {params.category && formatLink(params.category as string)}
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 0.9, y: 0 }}
+          transition={{ delay: 0.8, duration: 1 }}
+          className="mt-6 text-lg md:text-xl text-white/80 max-w-2xl mx-auto"
+        >
+          {currentDepartment?.description}
+        </motion.p>
+
+        {/* CTA Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1, duration: 0.8 }}
+          className="mt-10"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            className="px-8 py-4 rounded-full bg-white text-black font-semibold shadow-lg hover:shadow-2xl transition-all"
+          >
+            Explorar Productos
+          </motion.button>
+        </motion.div>
       </div>
+
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 to-transparent" />
+      <FlechaFlotante />
     </header>
   );
 }
