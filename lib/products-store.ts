@@ -73,11 +73,13 @@ interface ProductsStore {
   removeProduct: (id: string) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
   getProductById: (id: string) => Promise<Product | undefined>;
+  getProductByIdAdmin: (id: string) => Promise<Product | undefined>;
   // Fetch actions
   fetchProducts: (
     page?: number,
     limit?: number,
     search?: string,
+    category?: string,
   ) => Promise<void>;
   searchProducts: (query: string) => Product[];
 }
@@ -144,6 +146,38 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       return undefined;
     }
   },
+  getProductByIdAdmin: async (id: string) => {
+    set({ loading: true, error: null });
+
+    try {
+      const response = await fetch(`${apiUrl}/products/${id}`);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch product");
+      }
+
+      const product: Product = await response.json();
+
+      // Guardar en el store si no existe
+      set((state) => {
+        const exists = state.products.some((p) => p._id === id);
+
+        return {
+          products: exists ? state.products : [...state.products, product],
+          loading: false,
+        };
+      });
+
+      return product;
+    } catch (error) {
+      console.error("Error fetching product by id:", error);
+      set({
+        error: error instanceof Error ? error.message : "Error",
+        loading: false,
+      });
+      return undefined;
+    }
+  },
 
   searchProducts: (query: string) => {
     const state = get();
@@ -154,7 +188,7 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
   },
 
   // Fetch products from API
-  fetchProducts: async (page = 1, limit = 10, search = "") => {
+  fetchProducts: async (page = 1, limit = 10, search = "", category = "") => {
     set({ loading: true, error: null });
     try {
       const queryParams = new URLSearchParams();
@@ -162,6 +196,9 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       queryParams.append("limit", limit.toString());
       if (search) {
         queryParams.append("search", search);
+      }
+      if (category) {
+        queryParams.append("category", category);
       }
 
       const response = await fetch(`${apiUrl}/products?${queryParams}`);

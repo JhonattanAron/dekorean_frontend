@@ -32,21 +32,22 @@ export function ProductsGrid() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [addedToCart, setAddedToCart] = useState<Set<string>>(new Set());
   const param = useParams();
+  const category = param.category as string | undefined;
 
   useEffect(() => {
-    fetchProducts(1, 12);
+    fetchProducts(1, 100, "", category);
   }, []);
 
   const handlePrevious = () => {
     if (page > 1) {
-      fetchProducts(page - 1, 12);
+      fetchProducts(page - 1, 12, category);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleNext = () => {
     if (page < totalPages) {
-      fetchProducts(page + 1, 12);
+      fetchProducts(page + 1, 12, category);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
@@ -104,6 +105,73 @@ export function ProductsGrid() {
       </div>
       <SearchModal />
 
+      {/* Pagination */}
+      {!loading && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 pt-8 border-t border-border">
+          <button
+            onClick={handlePrevious}
+            disabled={page === 1}
+            className="p-2 rounded-lg border border-border hover:border-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronLeft className="w-5 h-5 text-foreground" />
+          </button>
+
+          <div className="flex items-center gap-2">
+            {(() => {
+              const pages = [];
+
+              const start = Math.max(1, page - 1);
+              const end = Math.min(totalPages, page + 1);
+
+              if (start > 1) {
+                pages.push(1);
+                if (start > 2) pages.push("...");
+              }
+
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              if (end < totalPages) {
+                if (end < totalPages - 1) pages.push("...");
+                pages.push(totalPages);
+              }
+
+              return pages.map((p, i) =>
+                p === "..." ? (
+                  <span
+                    key={`${p}-${i}`}
+                    className="px-2 text-muted-foreground"
+                  >
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => fetchProducts(p as number, 12, category)}
+                    className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
+                      p === page
+                        ? "bg-foreground text-background"
+                        : "border border-border hover:border-foreground text-foreground"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ),
+              );
+            })()}
+          </div>
+
+          <button
+            onClick={handleNext}
+            disabled={page === totalPages}
+            className="p-2 rounded-lg border border-border hover:border-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronRight className="w-5 h-5 text-foreground" />
+          </button>
+        </div>
+      )}
+
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
         {loading ? (
@@ -115,7 +183,7 @@ export function ProductsGrid() {
           </div>
         ) : products.length > 0 ? (
           products.map((product, index) => (
-            <Link key={product._id} href={`/productos/${product.slug}`}>
+            <Link key={index} href={`/productos/${product.slug}`}>
               <div className="glass rounded-xl overflow-hidden group hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 flex flex-col border border-white/5 cursor-pointer h-full backdrop-blur-md bg-card/60">
                 {/* Image */}
                 <div className="relative aspect-square overflow-hidden bg-slate-900">
@@ -214,19 +282,49 @@ export function ProductsGrid() {
           </button>
 
           <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => fetchProducts(p, 12)}
-                className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${
-                  p === page
-                    ? "bg-foreground text-background"
-                    : "border border-border hover:border-foreground text-foreground"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
+            {(() => {
+              const pages = [];
+
+              const start = Math.max(1, page - 1);
+              const end = Math.min(totalPages, page + 1);
+
+              if (start > 1) {
+                pages.push(1);
+                if (start > 2) pages.push("...");
+              }
+
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              if (end < totalPages) {
+                if (end < totalPages - 1) pages.push("...");
+                pages.push(totalPages);
+              }
+
+              return pages.map((p, i) =>
+                p === "..." ? (
+                  <span
+                    key={`${p}-${i}`}
+                    className="px-2 text-muted-foreground"
+                  >
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => fetchProducts(p as number, 12, category)}
+                    className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
+                      p === page
+                        ? "bg-foreground text-background"
+                        : "border border-border hover:border-foreground text-foreground"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ),
+              );
+            })()}
           </div>
 
           <button

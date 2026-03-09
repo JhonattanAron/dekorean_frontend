@@ -30,7 +30,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <h2 className="text-xl font-bold mb-6">Admin</h2>
 
         <nav className="flex flex-col space-y-2">
-          <a href="/admin/products" className="px-2 py-1 hover:underline">
+          <a href="/admin/aron" className="px-2 py-1 hover:underline">
             Productos
           </a>
           <a href="/admin/users" className="px-2 py-1 hover:underline">
