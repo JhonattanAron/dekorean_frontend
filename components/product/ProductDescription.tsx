@@ -73,25 +73,33 @@ export function ProductDescription({
 
   return (
     <div className="space-y-6 w-full">
-      <Section icon={FileText} title="Overview" content={displayOverview} />
+      <Section
+        icon={FileText}
+        title="Descripción general"
+        content={displayOverview}
+      />
 
-      <Section icon={Sparkles} title="Highlights" content={displayHighlights} />
+      <Section
+        icon={Sparkles}
+        title="Características destacadas"
+        content={displayHighlights}
+      />
 
       <Section
         icon={Wrench}
-        title="Installation"
+        title="Instalación"
         content={displayInstallation}
       />
 
       <Section
         icon={ListChecks}
-        title="Installation Steps"
+        title="Pasos de instalación"
         content={displayInstallationSteps}
       />
 
       <Section
         icon={ShoppingCart}
-        title="Purchase Information"
+        title="Información de compra"
         content={displayPurchaseInstructions}
       />
     </div>
