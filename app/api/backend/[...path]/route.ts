@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/env";
+
 type Context = {
   params: Promise<{
     path: string[];
@@ -41,23 +42,54 @@ async function proxy(req: NextRequest, path: string[]) {
 
   const url = `${env.API_URL}/${path.join("/")}${req.nextUrl.search}`;
 
-  const headers = new Headers(req.headers);
-  headers.delete("host"); // evita conflictos
+  /* ---------------- SAFE HEADERS ---------------- */
+
+  const allowedHeaders = [
+    "accept",
+    "authorization",
+    "content-type",
+    "x-user-id",
+    "cookie",
+  ];
+
+  const headers = new Headers();
+
+  req.headers.forEach((value, key) => {
+    if (allowedHeaders.includes(key.toLowerCase())) {
+      headers.set(key, value);
+    }
+  });
 
   if (!isPublic) {
     const userId = req.headers.get("x-user-id");
     if (userId) headers.set("x-user-id", userId);
   }
 
+  /* ---------------- FETCH ---------------- */
+
   const res = await fetch(url, {
     method: req.method,
     headers,
-    body: req.body, // 🔑 pasar el stream sin leerlo
-    duplex: "half", // requerido en Node/Next para streams
+    body: req.body,
+    duplex: "half",
   } as any);
+
+  /* ---------------- RESPONSE ---------------- */
+
+  const responseHeaders = new Headers();
+
+  res.headers.forEach((value, key) => {
+    if (
+      key !== "transfer-encoding" &&
+      key !== "connection" &&
+      key !== "keep-alive"
+    ) {
+      responseHeaders.set(key, value);
+    }
+  });
 
   return new NextResponse(res.body, {
     status: res.status,
-    headers: res.headers,
+    headers: responseHeaders,
   });
 }
