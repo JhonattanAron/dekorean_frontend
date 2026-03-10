@@ -88,6 +88,7 @@ export default function ProductsTable() {
               <th className="px-4 py-3">Categorías</th>
 
               <th className="px-4 py-3">Precio</th>
+              <th className="px-4 py-3">Imagenes Editadas</th>
 
               <th className="px-4 py-3 text-right">Acciones</th>
             </tr>
@@ -144,6 +145,18 @@ export default function ProductsTable() {
 
                   <td className="px-4 py-3 font-semibold">
                     ${p.price?.current ?? "-"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`px-3 py-1 text-xs font-semibold rounded-full border
+    ${
+      p.imagesUpdated
+        ? "bg-green-100 text-green-700 border-green-200"
+        : "bg-gray-100 text-gray-600 border-gray-200"
+    }`}
+                    >
+                      {p.imagesUpdated ? "Imágenes reemplazadas" : "Originales"}
+                    </span>
                   </td>
 
                   <td className="px-4 py-3 flex justify-end gap-2">

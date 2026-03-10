@@ -49,14 +49,12 @@ export interface Product {
 
   price?: Price;
   price_per_m2: number;
-
   reviews?: Reviews;
-
   slug: string;
   title: string;
-
   createdAt: string;
   updatedAt: string;
+  imagesUpdated: boolean;
 }
 
 interface ProductsStore {
