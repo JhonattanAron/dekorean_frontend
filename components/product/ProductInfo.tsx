@@ -120,11 +120,7 @@ export function ProductInfo({
 
       {/* Description */}
       <div className="bg-muted/50 rounded-lg p-4">
-        <p className="text-sm text-foreground leading-relaxed">
-          {description === "No description available."
-            ? "En Dekorans seleccionamos cuidadosamente productos de alta calidad diseñados para mejorar tus espacios con estilo, funcionalidad y durabilidad. Cada producto de nuestro catálogo está pensado para ofrecer una solución práctica y estética, adaptándose a diferentes necesidades de decoración y renovación.."
-            : description}
-        </p>
+        <p className="text-sm text-foreground leading-relaxed">{description}</p>
       </div>
 
       {/* Quantity and Add to Cart */}

@@ -181,7 +181,8 @@ export default function ProductPage() {
               reviewCount={product.reviews?.count ?? 0}
               inStock={true}
               description={
-                product.description.general ?? "No description available."
+                product.description.general ??
+                "En Dekorans seleccionamos cuidadosamente productos de alta calidad diseñados para mejorar tus espacios con estilo, funcionalidad y durabilidad. Cada producto de nuestro catálogo está pensado para ofrecer una solución práctica y estética, adaptándose a diferentes necesidades de decoración y renovación.."
               }
               category={product.category?.[0]}
               currency={product.price.currency}

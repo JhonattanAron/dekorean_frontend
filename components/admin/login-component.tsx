@@ -15,16 +15,26 @@ interface LoginModalProps {
 export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const succes = await login(email, password);
-    if (succes) {
-      router.push("/");
-    }
+
     setIsLoading(true);
+    setError("");
+
+    const result = await login(email, password);
+
+    if (result.success) {
+      router.push("/");
+      return;
+    }
+
+    setError(result.message || "Error al iniciar sesión");
+    setIsLoading(false);
   };
 
   if (!isOpen) return null;
@@ -39,16 +49,13 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
       {/* Modal */}
       <div className="relative z-10 w-full max-w-md mx-4 bg-black bg-card border border-muted rounded-lg shadow-lg p-6 sm:p-8">
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-1 hover:bg-muted rounded-md transition-colors"
-          aria-label="Cerrar"
         >
           <X className="w-5 h-5 text-muted-foreground" />
         </button>
 
-        {/* Header */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-foreground">Iniciar sesión</h2>
           <p className="text-sm text-muted-foreground mt-1">
@@ -56,17 +63,12 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="text-sm font-medium text-foreground"
-            >
+            <label className="text-sm font-medium text-foreground">
               Usuario o Email
             </label>
             <Input
-              id="email"
               type="text"
               placeholder="ejemplo@correo.com"
               value={email}
@@ -76,14 +78,10 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium text-foreground"
-            >
+            <label className="text-sm font-medium text-foreground">
               Contraseña
             </label>
             <Input
-              id="password"
               type="password"
               placeholder="••••••••"
               value={password}
@@ -92,7 +90,9 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
             />
           </div>
 
-          {/* Submit button */}
+          {/* Error */}
+          {error && <p className="text-sm text-red-500 font-medium">{error}</p>}
+
           <Button
             type="submit"
             disabled={isLoading}
