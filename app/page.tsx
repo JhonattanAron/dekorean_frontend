@@ -2,7 +2,7 @@
 
 import { Navbar } from "@/components/navbar";
 import { FooterImproved } from "@/components/footer-improved";
-import { HomeHero } from "@/components/home-hero";
+import { HomeHero } from "@/components/homeHeader/carousel-slides/home-hero";
 import { ProductsCatalog } from "@/components/products-catalog";
 import { QualitySection } from "@/components/quality-section";
 import { VideoSection } from "@/components/video-section";
@@ -11,6 +11,7 @@ import { FinalCTA } from "@/components/final-cta";
 
 import Image from "next/image";
 import LayoutPage from "@/components/layoutPage";
+import { CarouselContainer } from "@/components/homeHeader/carousel-container";
 
 const DekoransLogo = () => (
   <img
@@ -46,7 +47,7 @@ export default function Home() {
   return (
     <LayoutPage>
       {/* Home Hero Section */}
-      <HomeHero />
+      <CarouselContainer />
 
       {/* Products Catalog Section */}
       <ProductsCatalog />
