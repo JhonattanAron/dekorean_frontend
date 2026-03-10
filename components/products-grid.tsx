@@ -40,14 +40,14 @@ export function ProductsGrid() {
 
   const handlePrevious = () => {
     if (page > 1) {
-      fetchProducts(page - 1, 12, category);
+      fetchProducts(page - 1, 12, "", category);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleNext = () => {
     if (page < totalPages) {
-      fetchProducts(page + 1, 12, category);
+      fetchProducts(page + 1, 12, "", category);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
@@ -107,7 +107,7 @@ export function ProductsGrid() {
 
       {/* Pagination */}
       {!loading && totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 pt-8 border-t border-border">
+        <div className="flex items-center justify-center gap-4 p-8 border-t border-border">
           <button
             onClick={handlePrevious}
             disabled={page === 1}
@@ -148,7 +148,7 @@ export function ProductsGrid() {
                 ) : (
                   <button
                     key={p}
-                    onClick={() => fetchProducts(p as number, 12, category)}
+                    onClick={() => fetchProducts(p as number, 12, "", category)}
                     className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
                       p === page
                         ? "bg-foreground text-background"
@@ -313,7 +313,7 @@ export function ProductsGrid() {
                 ) : (
                   <button
                     key={p}
-                    onClick={() => fetchProducts(p as number, 12, category)}
+                    onClick={() => fetchProducts(p as number, 12, "", category)}
                     className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
                       p === page
                         ? "bg-foreground text-background"

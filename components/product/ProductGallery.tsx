@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ProductGalleryProps {
   images: string[];
@@ -10,63 +9,40 @@ interface ProductGalleryProps {
 }
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(0);
 
-  const goToNext = () => {
-    setSelectedIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const goToPrev = () => {
-    setSelectedIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
+  const displayImages = images.length > 0 ? images : ["/placeholder.jpg"];
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative   rounded-lg overflow-hidden aspect-square group">
+      <div className="relative bg-muted rounded-lg overflow-hidden aspect-square">
         <img
-          src={images[selectedIndex]}
-          alt={`${productName} view ${selectedIndex + 1}`}
+          src={displayImages[selectedImage]}
+          alt={`${productName} - Image ${selectedImage + 1}`}
           className="object-cover"
+          sizes="(max-width: 768px) 100vw, 50vw"
         />
-        {images.length > 1 && (
-          <>
-            <button
-              onClick={goToPrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm rounded-full p-2 hover:bg-background transition-all opacity-0 group-hover:opacity-100"
-              aria-label="Previous image"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button
-              onClick={goToNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm rounded-full p-2 hover:bg-background transition-all opacity-0 group-hover:opacity-100"
-              aria-label="Next image"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          </>
-        )}
       </div>
 
-      {/* Thumbnails */}
-      {images.length > 1 && (
-        <div className="flex gap-2">
-          {images.map((image, index) => (
+      {/* Thumbnail Gallery */}
+      {displayImages.length > 1 && (
+        <div className="grid grid-cols-4 gap-2">
+          {displayImages.map((image, index) => (
             <button
               key={index}
-              onClick={() => setSelectedIndex(index)}
-              className={`relative h-20 w-20 rounded-lg overflow-hidden transition-all ${
-                selectedIndex === index
-                  ? "ring-2 ring-foreground"
-                  : "opacity-60 hover:opacity-100"
+              onClick={() => setSelectedImage(index)}
+              className={`relative aspect-square rounded-md overflow-hidden border-2 transition-colors ${
+                selectedImage === index
+                  ? "border-primary"
+                  : "border-border hover:border-primary/50"
               }`}
-              aria-label={`View image ${index + 1}`}
             >
               <img
                 src={image}
-                alt={`${productName} thumbnail ${index + 1}`}
+                alt={`${productName} - Thumbnail ${index + 1}`}
                 className="object-cover"
+                sizes="100px"
               />
             </button>
           ))}

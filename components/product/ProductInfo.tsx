@@ -1,151 +1,213 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, Share2, Check } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Heart, ShoppingCart, Check } from "lucide-react";
 
 interface ProductInfoProps {
   name: string;
   price: number;
+  originalPrice?: number;
   rating: number;
   reviewCount: number;
   inStock: boolean;
   description: string;
+  category?: string;
+  currency?: string;
 }
 
 export function ProductInfo({
   name,
   price,
+  originalPrice,
   rating,
   reviewCount,
   inStock,
   description,
+  category,
+  currency = "EUR",
 }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [addedToCart, setAddedToCart] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const handleAddToCart = () => {
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
   };
 
+  const discount = originalPrice
+    ? Math.round(((originalPrice - price) / originalPrice) * 100)
+    : 0;
+
   return (
-    <div className="flex flex-col gap-6">
-      {/* Header */}
+    <div className="space-y-6">
+      {/* Category Badge */}
+      {category && (
+        <Badge variant="secondary" className="w-fit">
+          {category}
+        </Badge>
+      )}
+
+      {/* Title */}
       <div>
-        <h1 className="text-4xl font-bold mb-3 text-foreground">{name}</h1>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <span
-                  key={i}
-                  className={`text-lg ${
-                    i < Math.floor(rating) ? "text-foreground" : "text-muted"
-                  }`}
-                >
-                  ★
-                </span>
-              ))}
-            </div>
-            <span className="text-sm text-muted-foreground ml-2">
-              {rating} • {reviewCount.toLocaleString()} reviews
-            </span>
-          </div>
-        </div>
+        <h1 className="text-3xl font-bold text-foreground mb-2">{name}</h1>
       </div>
 
-      {/* Price */}
-      <div className="border-b border-border pb-6">
-        <p className="text-3xl font-bold text-foreground">${price}</p>
-        <p className="text-sm text-muted-foreground mt-1">
-          {inStock ? (
-            <span className="text-green-600 flex items-center gap-1">
-              <Check className="w-4 h-4" /> In Stock
+      {/* Rating */}
+      <div className="flex items-center gap-2">
+        <div className="flex gap-1">
+          {[...Array(5)].map((_, i) => (
+            <span
+              key={i}
+              className={`text-lg ${
+                i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"
+              }`}
+            >
+              ★
             </span>
-          ) : (
-            <span className="text-red-600">Out of Stock</span>
+          ))}
+        </div>
+        <span className="text-sm text-muted-foreground">
+          {rating.toFixed(1)} ({reviewCount} reviews)
+        </span>
+      </div>
+
+      {/* Price Section */}
+      <div className="space-y-2">
+        <div className="flex items-baseline gap-4">
+          <span className="text-4xl font-bold text-foreground">
+            {price.toLocaleString("es-ES", {
+              style: "currency",
+              currency: currency,
+            })}
+          </span>
+          {originalPrice && (
+            <>
+              <span className="text-xl text-muted-foreground line-through">
+                {originalPrice.toLocaleString("es-ES", {
+                  style: "currency",
+                  currency: currency,
+                })}
+              </span>
+              <Badge variant="destructive" className="text-lg px-3 py-1">
+                -{discount}%
+              </Badge>
+            </>
           )}
-        </p>
+        </div>
+
+        {/* Stock Status */}
+        <div className="flex items-center gap-2">
+          {inStock ? (
+            <>
+              <Check className="w-4 h-4 text-green-600" />
+              <span className="text-sm text-green-600 font-medium">
+                In Stock
+              </span>
+            </>
+          ) : (
+            <span className="text-sm text-destructive font-medium">
+              Out of Stock
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Description */}
-      <div>
-        <h3 className="font-semibold text-foreground mb-2">About this item</h3>
-        <p className="text-muted-foreground leading-relaxed">{description}</p>
+      <div className="bg-muted/50 rounded-lg p-4">
+        <p className="text-sm text-foreground leading-relaxed">
+          {description === "No description available."
+            ? "En Dekorans seleccionamos cuidadosamente productos de alta calidad diseñados para mejorar tus espacios con estilo, funcionalidad y durabilidad. Cada producto de nuestro catálogo está pensado para ofrecer una solución práctica y estética, adaptándose a diferentes necesidades de decoración y renovación.."
+            : description}
+        </p>
       </div>
 
-      {/* Quantity Selector */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm font-medium text-foreground">Quantity:</span>
-        <div className="flex items-center gap-3 bg-secondary rounded-lg p-1">
-          <button
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="px-3 py-2 hover:bg-background rounded transition-colors"
-            aria-label="Decrease quantity"
+      {/* Quantity and Add to Cart */}
+      <div className="space-y-4">
+        <FieldGroup>
+          <Field>
+            <FieldLabel>Quantity</FieldLabel>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                disabled={!inStock}
+              >
+                −
+              </Button>
+              <Input
+                type="number"
+                min="1"
+                max="999"
+                value={quantity}
+                onChange={(e) =>
+                  setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                }
+                className="w-16 text-center"
+                disabled={!inStock}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setQuantity(quantity + 1)}
+                disabled={!inStock}
+              >
+                +
+              </Button>
+            </div>
+          </Field>
+        </FieldGroup>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          <Button
+            size="lg"
+            className="flex-1 gap-2"
+            onClick={handleAddToCart}
+            disabled={!inStock}
           >
-            −
-          </button>
-          <span className="px-4 font-medium text-foreground">{quantity}</span>
-          <button
-            onClick={() => setQuantity(quantity + 1)}
-            className="px-3 py-2 hover:bg-background rounded transition-colors"
-            aria-label="Increase quantity"
+            <ShoppingCart className="w-5 h-5" />
+            {isAdded ? "Added to Cart!" : "Add to Cart"}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="lg"
+            className="px-4"
+            onClick={() => setIsFavorite(!isFavorite)}
           >
-            +
-          </button>
+            <Heart
+              className={`w-5 h-5 ${
+                isFavorite ? "fill-current text-red-500" : ""
+              }`}
+            />
+          </Button>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-3 pt-2">
-        <Button
-          onClick={handleAddToCart}
-          disabled={!inStock || addedToCart}
-          className="flex-1 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
-        >
-          {addedToCart ? (
-            <>
-              <Check className="w-5 h-5" />
-              Added to Cart
-            </>
-          ) : (
-            "Add to Cart"
-          )}
-        </Button>
-        <button
-          onClick={() => setIsWishlisted(!isWishlisted)}
-          className="px-4 py-3 rounded-lg border border-border hover:bg-secondary transition-colors"
-          aria-label="Add to wishlist"
-        >
-          <Heart
-            className={`w-5 h-5 ${
-              isWishlisted
-                ? "fill-destructive text-destructive"
-                : "text-foreground"
-            }`}
-          />
-        </button>
-        <button
-          className="px-4 py-3 rounded-lg border border-border hover:bg-secondary transition-colors"
-          aria-label="Share product"
-        >
-          <Share2 className="w-5 h-5 text-foreground" />
-        </button>
-      </div>
-
-      {/* Additional Info */}
-      <div className="bg-secondary rounded-lg p-4 space-y-2 text-sm">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">FREE Delivery</span>
-          <span className="font-medium">Wed, Feb 26</span>
+      {/* Shipping Info */}
+      <Card className="p-4 border-border/50 bg-muted/30">
+        <div className="space-y-3">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Free Shipping</span>
+            <span className="font-medium">On orders over 50€</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Delivery Time</span>
+            <span className="font-medium">3-5 business days</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Returns</span>
+            <span className="font-medium">30-day return policy</span>
+          </div>
         </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Returns</span>
-          <span className="font-medium">30-day returns</span>
-        </div>
-      </div>
+      </Card>
     </div>
   );
 }
