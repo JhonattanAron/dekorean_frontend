@@ -205,7 +205,7 @@ export default function ProductPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
               <ProductDescription
-                overview={product.description.overview}
+                overview={product.description.general}
                 highlights={product.description.highlights}
                 installation={product.description.installation}
                 installationSteps={product.description.installationSteps}

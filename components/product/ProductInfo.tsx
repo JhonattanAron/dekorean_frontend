@@ -118,11 +118,6 @@ export function ProductInfo({
         </div>
       </div>
 
-      {/* Description */}
-      <div className="bg-muted/50 rounded-lg p-4">
-        <p className="text-sm text-foreground leading-relaxed">{description}</p>
-      </div>
-
       {/* Quantity and Add to Cart */}
       <div className="space-y-4">
         <FieldGroup>
