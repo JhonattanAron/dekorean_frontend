@@ -4,6 +4,18 @@ import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { useParams, useRouter } from "next/navigation";
 import { useProductsStore } from "@/lib/products-store";
+interface SubCategory {
+  _id: string;
+  name: string;
+  slug: string;
+}
+
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  children?: SubCategory[];
+}
 
 export default function ProductsTable() {
   const router = useRouter();
@@ -13,6 +25,21 @@ export default function ProductsTable() {
     useProductsStore();
 
   const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/backend/categories/tree");
+        const data = await res.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("error cargando categorias", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const limit = 50;
 
@@ -45,30 +72,24 @@ export default function ProductsTable() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Productos</h1>
-
         <select
           value={category}
-          onChange={(e) => {
-            setCategory(e.target.value);
-          }}
+          onChange={(e) => setCategory(e.target.value)}
           className="bg-zinc-900 border border-zinc-700 px-3 py-2 rounded-lg text-sm"
         >
           <option value="">Todas las categorías</option>
 
-          <option value="3D Cement Brick">3D Cement Brick</option>
+          {categories.map((cat) => (
+            <optgroup key={cat._id} label={cat.name}>
+              <option value={cat.slug}>{cat.name}</option>
 
-          <option value="Bamboo charcoal fiber board">
-            Bamboo Charcoal Fiber Board
-          </option>
-          <option value="PU">PU</option>
-
-          <option value="Piedra Flexible">Piedra Flexible</option>
-
-          <option value="art-cement-board">Art Cement Board</option>
-
-          <option value="paneles">Paneles</option>
-
-          <option value="ultra-thin-stone">Ultra Thin Stone</option>
+              {cat.children?.map((sub) => (
+                <option key={sub._id} value={sub.slug}>
+                  └ {sub.name}
+                </option>
+              ))}
+            </optgroup>
+          ))}
         </select>
       </div>
 

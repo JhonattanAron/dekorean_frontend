@@ -131,7 +131,7 @@ export default function CategoryCarousel() {
             <Button
               key={dept.id}
               onClick={() => goToSlide(index)}
-              className={`px-5 py-2 rounded-full text-white font-medium transition-all transform hover:scale-110 ${
+              className={`px-5 py-2 rounded-full text-foreground font-medium transition-all transform hover:scale-110 ${
                 index === currentIndex
                   ? " scale-110"
                   : "bg-muted hover:bg-secondary"
