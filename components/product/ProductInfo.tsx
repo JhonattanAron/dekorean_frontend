@@ -81,11 +81,12 @@ export function ProductInfo({
       <div className="space-y-2">
         <div className="flex items-baseline gap-4">
           <span className="text-4xl font-bold text-foreground">
-            {price.toLocaleString("es-ES", {
+            {(Number.isFinite(price) ? price : 0).toLocaleString("es-ES", {
               style: "currency",
               currency: currency,
             })}
           </span>
+
           {originalPrice && (
             <>
               <span className="text-xl text-muted-foreground line-through">
