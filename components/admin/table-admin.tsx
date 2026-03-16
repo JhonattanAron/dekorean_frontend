@@ -26,6 +26,12 @@ export default function ProductsTable() {
 
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  function toggleProduct(id: string) {
+    setSelectedProducts((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
+    );
+  }
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -99,6 +105,20 @@ export default function ProductsTable() {
           <thead className="bg-zinc-900">
             <tr className="text-left border-b border-zinc-800">
               <th className="px-4 py-3">#</th>
+              <th className="px-4 py-3">
+                Todos
+                <br />
+                <input
+                  type="checkbox"
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedProducts(products.map((p) => p._id));
+                    } else {
+                      setSelectedProducts([]);
+                    }
+                  }}
+                />
+              </th>
 
               <th className="px-4 py-3">Imagen</th>
 
@@ -136,6 +156,13 @@ export default function ProductsTable() {
                 >
                   <td className="px-4 py-3 text-zinc-400">
                     {(page - 1) * limit + index + 1}
+                  </td>
+                  <td className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedProducts.includes(p._id)}
+                      onChange={() => toggleProduct(p._id)}
+                    />
                   </td>
 
                   <td className="px-4 py-3">
