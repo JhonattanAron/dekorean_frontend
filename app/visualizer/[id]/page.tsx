@@ -1,26 +1,46 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter, useParams } from "next/navigation";
-import { Visualizer } from "@/components/visualizer";
-import { HomeHero } from "@/components/homeHeader/carousel-slides/home-hero";
+import { Visualizer } from "@/components/vizualizer/visualizer";
 import LayoutPage from "@/components/layoutPage";
-import { ro } from "date-fns/locale";
+import { set } from "date-fns";
 
-function VisualizerContent() {
-  return (
-    <Visualizer
-      imageUrl="https://www.viacelere.com/wp-content/uploads/old-blog/2017/10/tipos-de-cocina_opt.jpg"
-      imageName="Imagen cargada"
-    />
-  );
+function VisualizerContent({
+  imageUrl,
+  imageName,
+}: {
+  imageUrl: string;
+  imageName: string;
+}) {
+  return <Visualizer imageUrl={imageUrl} imageName={imageName} />;
 }
 
 export default function VisualizerPage() {
   const searchParams = useSearchParams();
   const params = useParams();
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageName, setImageName] = useState("");
 
   const id = params.id;
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchProject = async () => {
+      try {
+        const res = await fetch(`/api/backend/users-projects/${id}`);
+        const data = await res.json();
+        setImageUrl(data.imageUrl);
+        setImageName(data.imageName);
+      } catch (error) {
+        console.error(error);
+      } finally {
+      }
+    };
+
+    fetchProject();
+  }, [id]);
 
   if (!id) {
     return <div>sin Id</div>;
@@ -35,7 +55,7 @@ export default function VisualizerPage() {
           </div>
         }
       >
-        <VisualizerContent />
+        <VisualizerContent imageUrl={imageUrl} imageName="Imagen cargada" />
       </Suspense>
     </LayoutPage>
   );

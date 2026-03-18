@@ -22,7 +22,7 @@ export default function LayoutPage({
 
   const navLinks = [
     { label: "Productos", href: "/productos", active: true },
-    { label: "Visor Interactivo", href: "/visualizer/demo" },
+    { label: "Visor Interactivo", href: "/visualizer" },
     { label: "Empresas", href: "#empresas" },
     { label: "Soporte", href: "#soporte" },
   ];
