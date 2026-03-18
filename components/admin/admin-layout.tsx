@@ -33,8 +33,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <a href="/admin/aron" className="px-2 py-1 hover:underline">
             Productos
           </a>
-          <a href="/admin/users" className="px-2 py-1 hover:underline">
-            Usuarios
+          <a
+            href="/admin/aron/categories"
+            className="px-2 py-1 hover:underline"
+          >
+            Categorias
           </a>
           <a href="/admin/settings" className="px-2 py-1 hover:underline">
             Configuración

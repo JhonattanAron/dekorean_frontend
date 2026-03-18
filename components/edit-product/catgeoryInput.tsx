@@ -10,6 +10,7 @@ import { CreateCategoryModal } from "./create-category-modal";
 interface Category {
   _id: string;
   name: string;
+  slug: string;
 }
 
 interface CategoryInputProps {
@@ -80,7 +81,7 @@ export function CategoryInput({
         <option value="">Seleccionar categoría</option>
 
         {categories.map((cat) => (
-          <option key={cat._id} value={cat.name}>
+          <option key={cat._id} value={cat.slug}>
             {cat.name}
           </option>
         ))}

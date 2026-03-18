@@ -26,24 +26,6 @@ export function HomeHero() {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 300], [0, 50]);
 
-  const handleUpload = (files: FileList | null) => {
-    if (files && files[0]) {
-      const file = files[0];
-      setUploadedFile(file);
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        const encodedUrl = encodeURIComponent(imageUrl);
-        const encodedName = encodeURIComponent(file.name);
-        router.push(
-          `/visualizer?imageUrl=${encodedUrl}&imageName=${encodedName}`,
-        );
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleDemoClick = (index: number) => {
     setSelectedDemo(index);
     if (demoImages[index]) {
@@ -256,8 +238,6 @@ export function HomeHero() {
               description="Soporta formatos JPG, PNG y HEIC hasta 20MB."
               buttonText="Subir Una Foto"
               demoImages={demoImages}
-              onUpload={handleUpload}
-              onDemoClick={handleDemoClick}
             />
           </motion.div>
         </motion.div>

@@ -13,54 +13,46 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-interface Category {
-  _id: string;
-  name: string;
-  slug: string;
-}
+import { Category } from "@/app/admin/[admin]/categories/page";
 
 interface Props {
   open: boolean;
   setOpen: (v: boolean) => void;
-  onCreated?: (cat: Category) => void;
+  category: Category | null;
+  onUpdated?: (cat: Category) => void;
 }
 
-export function CreateCategoryModal({ open, setOpen, onCreated }: Props) {
-  const [type, setType] = useState("main");
+export function EditCategoryModal({
+  open,
+  setOpen,
+  category,
+  onUpdated,
+}: Props) {
   const [name, setName] = useState("");
-  const [parent, setParent] = useState("");
-
   const [icon, setIcon] = useState("📦");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [mainCategories, setMainCategories] = useState<Category[]>([]);
-
   const resetState = () => {
-    setType("main");
-    setName("");
-    setParent("");
     setIcon("📦");
     setSuccess(false);
     setLoading(false);
   };
 
-  const handleCreate = async () => {
+  const handleUpdate = async () => {
+    if (!category) return;
+
     try {
       setLoading(true);
 
       const body = {
         name,
         icon,
-        parent: type === "sub" ? parent : null,
       };
-      console.log(body);
 
-      const res = await fetch("/api/backend/categories", {
-        method: "POST",
+      const res = await fetch(`/api/backend/categories/${category._id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -72,33 +64,24 @@ export function CreateCategoryModal({ open, setOpen, onCreated }: Props) {
       setSuccess(true);
       setLoading(false);
 
-      onCreated?.(data);
+      onUpdated?.(data);
 
       setTimeout(() => {
         setOpen(false);
         resetState();
       }, 1200);
     } catch (error) {
-      console.error("error creando categoria", error);
+      console.error("error actualizando categoria", error);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!open) return;
-
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/backend/categories/main");
-        const data = await res.json();
-        setMainCategories(data);
-      } catch (error) {
-        console.error("error cargando categorias", error);
-      }
-    };
-
-    fetchCategories();
-  }, [open]);
+    if (category && open) {
+      setName(category.name);
+      setIcon(category.icon);
+    }
+  }, [category, open]);
 
   const onEmojiClick = (emojiData: EmojiClickData) => {
     setIcon(emojiData.emoji);
@@ -115,14 +98,12 @@ export function CreateCategoryModal({ open, setOpen, onCreated }: Props) {
     >
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
-          <DialogTitle>Crear Categoría</DialogTitle>
+          <DialogTitle>Editar Categoría</DialogTitle>
         </DialogHeader>
 
         {!success ? (
           <>
             <div className="space-y-4 py-2">
-              {/* nombre */}
-
               <div className="space-y-2">
                 <label className="text-sm font-medium">
                   Nombre de la categoría
@@ -134,8 +115,6 @@ export function CreateCategoryModal({ open, setOpen, onCreated }: Props) {
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
-
-              {/* icon selector */}
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Icono</label>
@@ -157,43 +136,6 @@ export function CreateCategoryModal({ open, setOpen, onCreated }: Props) {
                   </div>
                 )}
               </div>
-
-              {/* tipo */}
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Tipo de categoría</label>
-
-                <select
-                  className="w-full h-10 border rounded-md px-3 text-sm"
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                >
-                  <option value="main">Categoría principal</option>
-                  <option value="sub">Subcategoría</option>
-                </select>
-              </div>
-
-              {/* categoria padre */}
-
-              {type === "sub" && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Categoría padre</label>
-
-                  <select
-                    className="w-full h-10 border rounded-md px-3 text-sm"
-                    value={parent}
-                    onChange={(e) => setParent(e.target.value)}
-                  >
-                    <option value="">Seleccionar</option>
-
-                    {mainCategories.map((category) => (
-                      <option key={category._id} value={category._id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
             </div>
 
             <DialogFooter>
@@ -201,8 +143,8 @@ export function CreateCategoryModal({ open, setOpen, onCreated }: Props) {
                 Cancelar
               </Button>
 
-              <Button onClick={handleCreate} disabled={loading || !name}>
-                {loading ? "Creando..." : "Crear categoría"}
+              <Button onClick={handleUpdate} disabled={loading || !name}>
+                {loading ? "Actualizando..." : "Actualizar"}
               </Button>
             </DialogFooter>
           </>
@@ -211,11 +153,11 @@ export function CreateCategoryModal({ open, setOpen, onCreated }: Props) {
             <div className="text-5xl">✅</div>
 
             <h2 className="text-xl font-semibold text-green-600">
-              Categoría creada con éxito
+              Categoría actualizada
             </h2>
 
             <p className="text-sm text-muted-foreground">
-              La categoría ya está disponible para usar.
+              Los cambios se han guardado correctamente.
             </p>
           </div>
         )}

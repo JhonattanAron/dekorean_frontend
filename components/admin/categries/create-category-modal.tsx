@@ -13,12 +13,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-interface Category {
-  _id: string;
-  name: string;
-  slug: string;
-}
+import { Category } from "@/app/admin/[admin]/categories/page";
 
 interface Props {
   open: boolean;

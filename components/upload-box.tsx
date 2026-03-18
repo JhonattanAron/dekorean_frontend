@@ -3,14 +3,15 @@
 import { Cloud, Upload, Image } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
 
 interface UploadBoxProps {
   title: string;
   description: string;
   buttonText: string;
   demoImages?: Array<{ src: string; alt: string }>;
-  onUpload: (files: FileList | null) => void;
-  onDemoClick: (index: number) => void;
+  onDemoClick?: (index: number) => void;
 }
 
 export function UploadBox({
@@ -18,12 +19,13 @@ export function UploadBox({
   description,
   buttonText,
   demoImages = [],
-  onUpload,
   onDemoClick,
 }: UploadBoxProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [hoveredDemo, setHoveredDemo] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -37,7 +39,10 @@ export function UploadBox({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    onUpload(e.dataTransfer.files);
+
+    if (e.dataTransfer.files?.[0]) {
+      handleUpload(e.dataTransfer.files[0]);
+    }
   };
 
   const handleButtonClick = () => {
@@ -45,96 +50,87 @@ export function UploadBox({
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpload(e.target.files);
+    if (e.target.files?.[0]) {
+      handleUpload(e.target.files[0]);
+    }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.6,
-        ease: [0.23, 1, 0.32, 1],
-      },
-    },
-  };
+  // 🔥 FUNCIÓN REAL (arreglada)
+  const handleUpload = async (file: File) => {
+    if (loading) return; // 🔥 evita doble ejecución
+    try {
+      setLoading(true);
 
-  const demoVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: 0.1 + i * 0.1,
-        duration: 0.5,
-      },
-    }),
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // 1. subir imagen
+      const uploadRes = await fetch("/api/backend/storage/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) throw new Error("Error subiendo imagen");
+
+      const { url } = await uploadRes.json();
+
+      // 2. crear proyecto
+      const projectRes = await fetch("/api/backend/users-projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageUrl: url,
+          name: "Mi proyecto", // 🔥 puedes cambiar luego
+        }),
+      });
+
+      if (!projectRes.ok) throw new Error("Error creando proyecto");
+
+      const project = await projectRes.json();
+
+      // 3. redirigir
+      router.push(`/visualizer/${project._id}`);
+    } catch (error) {
+      console.error(error);
+      alert("Error subiendo imagen");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <motion.div className="w-full max-w-md" initial="hidden" animate="visible">
-      {/* Main upload area */}
       <motion.div
         className="relative group"
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        whileHover={{ scale: 1.02 }}
-        transition={{ type: "spring", stiffness: 300 }}
       >
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          animate={{
-            opacity: isDragging ? 1 : 0,
-            scale: isDragging ? 1.05 : 1,
-          }}
-        />
-
         <div
-          className={`relative border-2 border-dashed rounded-2xl p-8 backdrop-blur-md transition-all duration-300 ${
+          className={`relative border-2 border-dashed rounded-2xl p-8 backdrop-blur-md transition-all ${
             isDragging
-              ? "border-cyan-400 bg-gradient-to-br from-cyan-500/20 to-purple-500/20"
-              : "border-white/20 bg-gradient-to-br from-white/5 to-white/10 hover:border-cyan-400/50 hover:bg-gradient-to-br hover:from-cyan-500/10 hover:to-purple-500/10"
+              ? "border-cyan-400 bg-cyan-500/20"
+              : "border-white/20 bg-white/5 hover:border-cyan-400/50"
           }`}
         >
-          {/* Upload icon with animation */}
-          <motion.div
-            className="flex justify-center mb-4"
-            animate={isDragging ? { scale: 1.2, y: -10 } : { scale: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 400 }}
-          >
-            <div className="relative">
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-400 rounded-full blur opacity-50 group-hover:opacity-75 transition-opacity"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-              <Cloud className="relative w-12 h-12 text-cyan-400 z-10" />
-            </div>
-          </motion.div>
+          {/* ICON */}
+          <div className="flex justify-center mb-4">
+            <Cloud className="w-12 h-12 text-cyan-400" />
+          </div>
 
-          {/* Title */}
-          <motion.h3
-            className="text-xl font-bold text-white text-center mb-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-          >
+          {/* TITLE */}
+          <h3 className="text-xl font-bold text-white text-center mb-2">
             {title}
-          </motion.h3>
+          </h3>
 
-          {/* Description */}
-          <motion.p
-            className="text-sm text-slate-300 text-center mb-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.15 }}
-          >
+          {/* DESC */}
+          <p className="text-sm text-slate-300 text-center mb-6">
             {description}
-          </motion.p>
+          </p>
 
-          {/* Upload button */}
+          {/* INPUT */}
           <input
             ref={fileInputRef}
             type="file"
@@ -143,77 +139,44 @@ export function UploadBox({
             className="hidden"
           />
 
-          <motion.button
+          {/* BUTTON */}
+          <Button
+            type="button"
             onClick={handleButtonClick}
-            className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all duration-300 shadow-lg shadow-cyan-500/25"
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 0 30px rgba(34, 211, 238, 0.4)",
-            }}
-            whileTap={{ scale: 0.95 }}
+            disabled={loading}
+            className="w-full px-6 py-3 bg-cyan-500 hover:bg-cyan-600 disabled:opacity-50 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
           >
             <Upload className="w-5 h-5" />
-            {buttonText}
-          </motion.button>
+            {loading ? "Subiendo..." : buttonText}
+          </Button>
         </div>
       </motion.div>
 
-      {/* Demo images */}
+      {/* DEMOS */}
       {demoImages.length > 0 && (
-        <motion.div
-          className="mt-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <p className="text-sm font-semibold text-slate-300 mb-4 text-center">
-            O prueba con nuestras demos
-          </p>
-          <div className="grid grid-cols-2 gap-4">
-            {demoImages.map((demo, index) => (
-              <motion.button
-                key={index}
-                variants={demoVariants}
-                custom={index}
-                initial="hidden"
-                animate="visible"
-                onClick={() => onDemoClick(index)}
-                onMouseEnter={() => setHoveredDemo(index)}
-                onMouseLeave={() => setHoveredDemo(null)}
-                className="relative group overflow-hidden rounded-lg aspect-square cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {/* Gradient overlay on hover */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-cyan-500/40 to-purple-500/40 opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center"
-                  animate={{ opacity: hoveredDemo === index ? 1 : 0 }}
-                >
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          {demoImages.map((demo, index) => (
+            <button
+              key={index}
+              onClick={() => onDemoClick?.(index)}
+              onMouseEnter={() => setHoveredDemo(index)}
+              onMouseLeave={() => setHoveredDemo(null)}
+              className="relative rounded-lg overflow-hidden"
+            >
+              <img
+                src={demo.src}
+                alt={demo.alt}
+                className="w-full h-full object-cover"
+              />
+
+              {hoveredDemo === index && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                   <Image className="w-6 h-6 text-white" />
-                </motion.div>
-
-                {/* Demo image */}
-                <img
-                  src={demo.src}
-                  alt={demo.alt}
-                  className="w-full h-full object-cover"
-                />
-
-                {/* Border effect */}
-                <motion.div
-                  className="absolute inset-0 border-2 border-cyan-400/0 rounded-lg"
-                  animate={{
-                    borderColor:
-                      hoveredDemo === index
-                        ? "rgba(34, 211, 238, 1)"
-                        : "rgba(34, 211, 238, 0)",
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
       )}
     </motion.div>
   );

@@ -4,6 +4,14 @@ import { ChangeEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useProductsStore, Product } from "@/lib/products-store";
 
+import { DndContext, closestCenter } from "@dnd-kit/core";
+
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+
 interface Props {
   product: Product;
   setProduct: (p: Product) => void;
@@ -153,6 +161,37 @@ export function ImageUploader({
     window.URL.revokeObjectURL(url);
   }
 
+  function handleDragEnd(event: any) {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = product.images.indexOf(active.id);
+    const newIndex = product.images.indexOf(over.id);
+
+    const updatedImages = arrayMove(product.images, oldIndex, newIndex);
+
+    const updatedProduct = {
+      ...product,
+      images: updatedImages,
+      mainImage: updatedImages[0], // 🔥 importante
+    };
+
+    setProduct(updatedProduct);
+
+    // 🔥 guardar en backend
+    fetch(`/api/backend/products/${product._id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        images: updatedImages,
+        mainImage: updatedImages[0],
+      }),
+    });
+
+    updateProduct(product._id, updatedProduct);
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {selectedImage && (
@@ -177,17 +216,65 @@ export function ImageUploader({
       </label>
 
       <div className="flex flex-wrap gap-2">
-        {product.images?.map((img, i) => (
-          <img
-            key={i}
-            src={img}
-            className={`w-20 h-20 object-cover rounded cursor-pointer border ${
-              img === selectedImage ? "border-blue-500" : "border-gray-300"
-            }`}
-            onClick={() => setSelectedImage(img)}
-          />
-        ))}
+        <DndContext
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={product.images || []}
+            strategy={rectSortingStrategy}
+          >
+            <div className="flex flex-wrap gap-2">
+              {product.images?.map((img) => (
+                <SortableImage
+                  key={img}
+                  id={img}
+                  src={img}
+                  selected={img === selectedImage}
+                  onClick={() => setSelectedImage(img)}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       </div>
     </div>
+  );
+}
+
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+function SortableImage({
+  id,
+  src,
+  selected,
+  onClick,
+}: {
+  id: string;
+  src: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <img
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      src={src}
+      onClick={onClick}
+      className={`w-20 h-20 object-cover rounded cursor-grab border ${
+        selected ? "border-blue-500" : "border-gray-300"
+      }`}
+    />
   );
 }
