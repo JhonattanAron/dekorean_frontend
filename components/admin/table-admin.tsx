@@ -91,7 +91,7 @@ export default function ProductsTable() {
       const data = await res.json();
 
       setProducts(data.data || []);
-      setTotalPages(data.totalPages || 1);
+      setTotalPages(data.pages || 1);
     } catch (err) {
       console.error("Error cargando productos:", err);
     } finally {
@@ -231,6 +231,30 @@ export default function ProductsTable() {
         >
           🗑 Eliminar ({selectedIds.length})
         </button>
+      </div>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <p className="text-sm text-muted-foreground">
+          Página <span className="font-semibold text-foreground">{page}</span>{" "}
+          de <span className="font-semibold text-foreground">{totalPages}</span>
+        </p>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPage((p) => Math.max(p - 1, 1))}
+            disabled={page === 1}
+            className="px-4 py-2 bg-card border border-border rounded-lg text-foreground hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          >
+            ← Anterior
+          </button>
+
+          <button
+            onClick={() => setPage((p) => (p < totalPages ? p + 1 : p))}
+            disabled={page === totalPages}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          >
+            Siguiente →
+          </button>
+        </div>
       </div>
 
       {/* ========== TABLE ========== */}

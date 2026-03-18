@@ -117,8 +117,8 @@ export function CategoryInput({
         onCreated={(newCategory: Category) => {
           fetchCategories();
 
-          if (!value.includes(newCategory.name)) {
-            onChange([...value, newCategory.name]);
+          if (!value.includes(newCategory.slug)) {
+            onChange([...value, newCategory.slug]);
           }
         }}
       />
