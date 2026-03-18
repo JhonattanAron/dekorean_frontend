@@ -2,17 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { ChevronDown, X, Menu } from "lucide-react";
+import Link from "next/link";
 
 interface SubCategory {
   _id: string;
   name: string;
   icon: string;
+  slug: string;
 }
 
 interface Category {
   _id: string;
   name: string;
   icon: string;
+  slug: string;
   children?: SubCategory[];
 }
 
@@ -129,14 +132,15 @@ export function CategorySidebar() {
                   category.children.length > 0 && (
                     <div className="ml-6 mt-2 space-y-1 pb-2 border-l border-white/10">
                       {category.children.map((sub) => (
-                        <button
+                        <Link
                           key={sub._id}
+                          href={`/productos/categories/${sub.slug}`}
                           className="flex items-center gap-2 w-full text-left px-3 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 rounded transition-colors duration-200"
                         >
                           <span className="text-sm">{sub.icon}</span>
 
                           <span>{sub.name}</span>
-                        </button>
+                        </Link>
                       ))}
                     </div>
                   )}
