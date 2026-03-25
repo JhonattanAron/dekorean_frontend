@@ -29,9 +29,7 @@ export function CategorySidebar() {
     setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
   };
 
-  const closeSidebar = () => {
-    setIsOpen(false);
-  };
+  const closeSidebar = () => setIsOpen(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -51,18 +49,18 @@ export function CategorySidebar() {
 
   return (
     <>
-      {/* Mobile Toggle Button */}
+      {/* Mobile Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 lg:hidden z-40 p-3 rounded-full bg-white/10 border border-white/20 backdrop-blur-md hover:bg-white/20 transition-all shadow-lg"
+        className="fixed bottom-6 right-6 lg:hidden z-40 p-3 rounded-full bg-card border border-border shadow-lg hover:bg-accent transition-all"
       >
-        <Menu className="w-5 h-5 text-white" />
+        <Menu className="w-5 h-5 text-foreground" />
       </button>
 
-      {/* Mobile Overlay */}
+      {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm lg:hidden z-30"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm lg:hidden z-30"
           onClick={closeSidebar}
         />
       )}
@@ -71,53 +69,52 @@ export function CategorySidebar() {
       <aside
         className={`
           fixed lg:static top-0 left-0 h-screen lg:h-auto
-          w-64 lg:w-56 
-          bg-gradient-to-b from-white/5 to-white/[0.02]
-          border-r border-white/10
-          backdrop-blur-xl
-          transition-transform duration-300 ease-out
-          lg:translate-x-0 z-40
+          w-64 lg:w-56
+          bg-card
+          border-r border-border
+          transition-transform duration-300
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-          overflow-y-auto lg:overflow-visible
-          flex flex-col
+          overflow-y-auto flex flex-col z-40
         `}
       >
-        {/* Close Button */}
+        {/* Close */}
         <button
           onClick={closeSidebar}
-          className="lg:hidden p-4 hover:bg-white/5 transition-colors"
+          className="lg:hidden p-4 hover:bg-accent transition"
         >
-          <X className="w-5 h-5 text-white" />
+          <X className="w-5 h-5 text-foreground" />
         </button>
 
         {/* Header */}
-        <div className="px-6 py-4 lg:py-6">
-          <h2 className="text-lg font-bold text-white mb-1">Categorías</h2>
-          <p className="text-xs text-white/60">Explora por categoría</p>
+        <div className="px-6 py-4">
+          <h2 className="text-lg font-bold text-foreground">Categorías</h2>
+          <p className="text-xs text-muted-foreground">Explora por categoría</p>
         </div>
 
         {/* Categories */}
-        <div className="flex-1 px-4 lg:px-0">
-          {loading && <p className="text-white/50 text-sm px-4">Cargando...</p>}
+        <div className="flex-1 px-4">
+          {loading && (
+            <p className="text-muted-foreground text-sm px-2">Cargando...</p>
+          )}
 
           {!loading &&
             categories.map((category) => (
               <div key={category._id} className="mb-2">
-                <div className="w-full px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">
+                <div className="w-full px-3 py-2 rounded-lg hover:bg-accent transition">
                   <div className="flex items-center justify-between gap-2">
-                    {/* LINK (más discreto) */}
+                    {/* Link */}
                     <Link
                       href={`/productos/categories/${category.slug}`}
                       className="flex items-center gap-3 flex-1 min-w-0"
                     >
                       <span className="text-lg">{category.icon}</span>
 
-                      <p className="text-sm font-semibold text-white truncate">
+                      <p className="text-sm font-medium text-foreground truncate">
                         {category.name}
                       </p>
                     </Link>
 
-                    {/* TOGGLE (más visible 🔥) */}
+                    {/* Toggle */}
                     {(category.children || []).length > 0 && (
                       <button
                         onClick={(e) => {
@@ -125,18 +122,16 @@ export function CategorySidebar() {
                           toggleCategory(category._id);
                         }}
                         className={`
-          flex items-center justify-center
-          w-8 h-8 rounded-full
-          bg-white/10 hover:bg-white/20
-          border border-white/20
-          transition-all duration-200
-          shrink-0
-        `}
+                          flex items-center justify-center
+                          w-8 h-8 rounded-full
+                          bg-muted hover:bg-primary/20
+                          transition-all
+                        `}
                       >
                         <ChevronDown
-                          className={`w-4 h-4 text-white transition-transform duration-300 ${
+                          className={`w-4 h-4 text-foreground transition-transform ${
                             expandedCategory === category._id
-                              ? "rotate-180"
+                              ? "rotate-180 text-primary"
                               : ""
                           }`}
                         />
@@ -149,15 +144,14 @@ export function CategorySidebar() {
                 {expandedCategory === category._id &&
                   category.children &&
                   category.children.length > 0 && (
-                    <div className="ml-6 mt-2 space-y-1 pb-2 border-l border-white/10">
+                    <div className="ml-4 mt-2 space-y-1 border-l border-border pl-3">
                       {category.children.map((sub) => (
                         <Link
                           key={sub._id}
                           href={`/productos/categories/${sub.slug}`}
-                          className="flex items-center gap-2 w-full text-left px-3 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 rounded transition-colors duration-200"
+                          className="flex items-center gap-2 px-2 py-1.5 text-xs text-muted-foreground hover:text-primary hover:bg-primary/10 rounded transition"
                         >
                           <span className="text-sm">{sub.icon}</span>
-
                           <span>{sub.name}</span>
                         </Link>
                       ))}

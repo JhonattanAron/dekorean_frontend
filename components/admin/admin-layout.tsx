@@ -2,6 +2,7 @@
 
 import { ReactNode, useState } from "react";
 import { X, Menu } from "lucide-react";
+import { ThemeToggle } from "../theme-toggle";
 
 type AdminLayoutProps = {
   children: ReactNode;
@@ -43,6 +44,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             Configuración
           </a>
         </nav>
+        <ThemeToggle />
       </aside>
 
       {/* Botón abrir sidebar (solo móvil) */}
