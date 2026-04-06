@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ImageSelector } from "./image-uploader";
+import { ImageSelector } from "./image-selector";
 
 interface ImagesTabProps {
   formData: any;
