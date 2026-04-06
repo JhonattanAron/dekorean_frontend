@@ -40,8 +40,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           >
             Categorias
           </a>
-          <a href="/admin/settings" className="px-2 py-1 hover:underline">
-            Configuración
+          <a href="/admin/aron/storage" className="px-2 py-1 hover:underline">
+            Storage
           </a>
         </nav>
         <ThemeToggle />

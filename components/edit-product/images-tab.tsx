@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ImageUploader } from "./image-uploader";
+import { ImageSelector } from "./image-uploader";
 
 interface ImagesTabProps {
   formData: any;
@@ -78,12 +78,7 @@ export function ImagesTab({
         </p>
       </div>
 
-      <ImageUploader
-        product={product}
-        setProduct={handleSetProduct}
-        selectedImage={selectedImage}
-        setSelectedImage={setSelectedImage}
-      />
+      <ImageSelector product={product} setProduct={handleSetProduct} />
     </div>
   );
 }

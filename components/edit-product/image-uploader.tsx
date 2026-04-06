@@ -1,280 +1,239 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useProductsStore, Product } from "@/lib/products-store";
-
-import { DndContext, closestCenter } from "@dnd-kit/core";
-
-import {
-  SortableContext,
-  arrayMove,
-  rectSortingStrategy,
-} from "@dnd-kit/sortable";
+import { Input } from "@/components/ui/input";
 
 interface Props {
   product: Product;
   setProduct: (p: Product) => void;
-  selectedImage: string | null;
-  setSelectedImage: (img: string) => void;
 }
 
-export function ImageUploader({
-  product,
-  setProduct,
-  selectedImage,
-  setSelectedImage,
-}: Props) {
+type FileItem = {
+  key: string;
+  url: string;
+};
+
+export function ImageSelector({ product, setProduct }: Props) {
   const { updateProduct } = useProductsStore();
-  const [uploading, setUploading] = useState(false);
 
-  /* ---------------- UPLOAD IMAGE ---------------- */
+  const [files, setFiles] = useState<FileItem[]>([]);
+  const [search, setSearch] = useState("");
+  const [selectedUrl, setSelectedUrl] = useState("");
+  const [selectedDelete, setSelectedDelete] = useState("");
+  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
 
-  async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
-    if (!e.target.files) return;
+  /* ---------------- FETCH FILES ---------------- */
 
-    const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append("file", file);
+  useEffect(() => {
+    fetchFiles();
+  }, []);
 
-    setUploading(true);
-
+  async function fetchFiles() {
     try {
-      const res = await fetch(`/api/backend/storage/upload`, {
-        method: "POST",
-        body: formData, // ✅ NO JSON
-      });
-
-      if (!res.ok) throw new Error("Error subiendo imagen");
-
+      const res = await fetch("/api/backend/storage/files");
       const data = await res.json();
-      const newImages = [...(product.images || []), data.url];
-
-      const updated: Product = {
-        ...product,
-        images: newImages,
-        mainImage: product.mainImage || data.url,
-      };
-
-      setProduct(updated);
-      setSelectedImage(data.url);
-
-      // ✅ PATCH solo con campos a actualizar
-      await fetch(`/api/backend/products/${product._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          images: newImages,
-          mainImage: updated.mainImage,
-        }),
-      });
-
-      updateProduct(product._id, updated);
+      setFiles(data.files || []);
     } catch (err) {
       console.error(err);
-      alert("Error subiendo imagen");
-    } finally {
-      setUploading(false);
     }
   }
 
-  /* ---------------- REPLACE IMAGE ---------------- */
+  /* ---------------- FILTER ---------------- */
 
-  async function handleReplace(e: ChangeEvent<HTMLInputElement>) {
-    if (!e.target.files || !selectedImage) return;
+  const filtered = files.filter((f) =>
+    f.url.toLowerCase().includes(search.toLowerCase()),
+  );
 
-    const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append("file", file);
+  /* ---------------- SAVE PRODUCT ---------------- */
 
-    setUploading(true);
-
-    try {
-      const res = await fetch(`/api/backend/storage/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("UPLOAD ERROR:", text);
-        throw new Error(text);
-      }
-
-      const data = await res.json();
-      const newImages =
-        product.images?.map((img) =>
-          img === selectedImage ? data.url : img,
-        ) || [];
-
-      const updated: Product = {
-        ...product,
-        images: newImages,
-        mainImage:
-          product.mainImage === selectedImage ? data.url : product.mainImage,
-      };
-
-      setProduct(updated);
-      setSelectedImage(data.url);
-      console.log(product._id);
-
-      await fetch(`/api/backend/products/${product._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          images: newImages,
-          mainImage: updated.mainImage,
-        }),
-      });
-
-      updateProduct(product._id, updated);
-    } catch (err) {
-      console.error(err);
-      alert("Error reemplazando imagen");
-    } finally {
-      setUploading(false);
-    }
-  }
-
-  /* ---------------- DOWNLOAD ---------------- */
-
-  async function handleDownload() {
-    if (!selectedImage) return;
-
-    const encodedUrl = encodeURIComponent(selectedImage);
-    const res = await fetch(`/api/backend/storage/download?url=${encodedUrl}`);
-
-    if (!res.ok) {
-      alert("Error descargando");
-      return;
-    }
-
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = selectedImage.split("/").pop() || "image.jpg";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-  }
-
-  function handleDragEnd(event: any) {
-    const { active, over } = event;
-
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = product.images.indexOf(active.id);
-    const newIndex = product.images.indexOf(over.id);
-
-    const updatedImages = arrayMove(product.images, oldIndex, newIndex);
-
-    const updatedProduct = {
-      ...product,
-      images: updatedImages,
-      mainImage: updatedImages[0], // 🔥 importante
-    };
-
-    setProduct(updatedProduct);
-
-    // 🔥 guardar en backend
-    fetch(`/api/backend/products/${product._id}`, {
+  async function saveProduct(updated: Product) {
+    await fetch(`/api/backend/products/${product._id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        images: updatedImages,
-        mainImage: updatedImages[0],
+        images: updated.images,
+        mainImage: updated.mainImage,
       }),
     });
 
-    updateProduct(product._id, updatedProduct);
+    updateProduct(product._id, updated);
   }
 
+  /* ---------------- ADD IMAGE ---------------- */
+
+  async function addImage(url: string) {
+    if (!url) return;
+
+    const newImages = [...(product.images || []), url];
+
+    const updated: Product = {
+      ...product,
+      images: newImages,
+      mainImage: product.mainImage || url,
+    };
+
+    setProduct(updated);
+    setSelectedUrl("");
+
+    await saveProduct(updated);
+  }
+
+  /* ---------------- REMOVE FROM PRODUCT ---------------- */
+
+  async function removeImage(url: string) {
+    const newImages = product.images.filter((img) => img !== url);
+
+    const updated: Product = {
+      ...product,
+      images: newImages,
+      mainImage:
+        product.mainImage === url ? newImages[0] || "" : product.mainImage,
+    };
+
+    setProduct(updated);
+    await saveProduct(updated);
+  }
+
+  /* ---------------- DELETE FROM STORAGE ---------------- */
+
+  async function deleteFromStorage() {
+    if (!selectedDelete) return;
+
+    const confirmDelete = confirm("¿Eliminar del storage?");
+    if (!confirmDelete) return;
+
+    await fetch(`/api/backend/storage/delete`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: selectedDelete }),
+    });
+
+    setSelectedDelete("");
+    fetchFiles();
+  }
+
+  /* ---------------- UI ---------------- */
+
   return (
-    <div className="flex flex-col gap-4">
-      {selectedImage && (
-        <div className="border rounded p-4 flex flex-col items-center gap-2">
-          <img src={selectedImage} className="max-h-96 object-contain" />
-          <Button onClick={handleDownload}>Descargar</Button>
-          <label className="cursor-pointer px-4 py-2 bg-yellow-500 text-white rounded">
-            {uploading ? "Subiendo..." : "Reemplazar imagen"}
-            <input
-              type="file"
-              hidden
-              accept="image/*"
-              onChange={handleReplace}
-            />
-          </label>
-        </div>
-      )}
+    <div className="flex flex-col gap-6">
+      {/* 🔍 BUSCADOR */}
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-semibold">Buscar imagen</label>
+        <Input
+          placeholder="Buscar por nombre..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full"
+        />
+      </div>
 
-      <label className="cursor-pointer px-4 py-2 bg-green-600 text-white rounded w-fit">
-        {uploading ? "Subiendo..." : "Agregar imagen"}
-        <input type="file" hidden accept="image/*" onChange={handleUpload} />
-      </label>
-
-      <div className="flex flex-wrap gap-2">
-        <DndContext
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={product.images || []}
-            strategy={rectSortingStrategy}
-          >
-            <div className="flex flex-wrap gap-2">
-              {product.images?.map((img) => (
-                <SortableImage
-                  key={img}
-                  id={img}
-                  src={img}
-                  selected={img === selectedImage}
-                  onClick={() => setSelectedImage(img)}
+      {/* 📂 GALERÍA CON PREVIEWS */}
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-semibold">
+          Imágenes disponibles ({filtered.length})
+        </label>
+        {filtered.length > 0 ? (
+          <div className="grid grid-cols-4 gap-4 md:grid-cols-6 lg:grid-cols-8">
+            {filtered.map((file) => (
+              <button
+                key={file.key}
+                onClick={() => addImage(file.url)}
+                onMouseEnter={() => setHoveredImage(file.url)}
+                onMouseLeave={() => setHoveredImage(null)}
+                className={`relative aspect-square rounded-lg border-2 overflow-hidden transition-all ${
+                  selectedUrl === file.url
+                    ? "border-blue-500 shadow-lg"
+                    : "border-gray-300 hover:border-blue-400"
+                }`}
+              >
+                <img
+                  src={file.url}
+                  alt={file.key}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
                 />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+
+                {/* Overlay con info al pasar el mouse */}
+                {hoveredImage === file.url && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <span className="text-white text-xs text-center px-2">
+                      Click para agregar
+                    </span>
+                  </div>
+                )}
+
+                {/* Checkmark si está seleccionada */}
+                {selectedUrl === file.url && (
+                  <div className="absolute top-2 right-2 bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center">
+                    <span className="text-white text-sm">✓</span>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            {search
+              ? "No hay imágenes que coincidan con tu búsqueda"
+              : "No hay imágenes disponibles"}
+          </div>
+        )}
+      </div>
+
+      {/* 🧾 IMÁGENES DEL PRODUCTO */}
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-semibold">
+          Imágenes del producto ({product.images?.length || 0})
+        </label>
+        {product.images && product.images.length > 0 ? (
+          <div className="flex flex-wrap gap-4">
+            {product.images.map((img) => (
+              <div key={img} className="relative group">
+                <img
+                  src={img}
+                  alt="producto"
+                  className="w-32 h-32 object-cover rounded-lg border-2 border-gray-300"
+                />
+
+                <button
+                  onClick={() => removeImage(img)}
+                  className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  ✕ Quitar
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-sm">
+            No hay imágenes en el producto
+          </p>
+        )}
+      </div>
+
+      {/* 🗑 DELETE STORAGE */}
+      <div className="flex flex-col gap-3 border-t pt-4">
+        <h3 className="font-semibold text-sm">Eliminar del storage</h3>
+
+        <select
+          value={selectedDelete}
+          onChange={(e) => setSelectedDelete(e.target.value)}
+          className="p-2 border rounded dark:bg-gray-800"
+        >
+          <option value="">Seleccionar archivo para eliminar</option>
+          {files.map((file) => (
+            <option key={file.key} value={file.url}>
+              {file.url.split("/").pop()}
+            </option>
+          ))}
+        </select>
+
+        <Button variant="destructive" onClick={deleteFromStorage}>
+          Eliminar del storage
+        </Button>
       </div>
     </div>
-  );
-}
-
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-
-function SortableImage({
-  id,
-  src,
-  selected,
-  onClick,
-}: {
-  id: string;
-  src: string;
-  selected: boolean;
-  onClick: () => void;
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <img
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      src={src}
-      onClick={onClick}
-      className={`w-20 h-20 object-cover rounded cursor-grab border ${
-        selected ? "border-blue-500" : "border-gray-300"
-      }`}
-    />
   );
 }

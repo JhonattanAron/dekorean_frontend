@@ -153,12 +153,13 @@ export function EditProduct({
       {/* TABS */}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
           <TabsTrigger value="basico">Básico</TabsTrigger>
           <TabsTrigger value="categorias">Categorías</TabsTrigger>
           <TabsTrigger value="precios">Precios</TabsTrigger>
           <TabsTrigger value="descripcion">Descripción</TabsTrigger>
           <TabsTrigger value="imagenes">Imágenes</TabsTrigger>
+          <TabsTrigger value="videos">Videos</TabsTrigger>
         </TabsList>
 
         <div className="bg-card border rounded-lg p-6 mt-6">
