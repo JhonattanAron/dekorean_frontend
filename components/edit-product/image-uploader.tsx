@@ -23,6 +23,8 @@ export function ImageSelector({ product, setProduct }: Props) {
   const [selectedUrl, setSelectedUrl] = useState("");
   const [selectedDelete, setSelectedDelete] = useState("");
   const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+  const isVideo = (url: string) => /\.(mp4|webm|mov)$/i.test(url);
+  const isImage = (url: string) => /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(url);
 
   /* ---------------- FETCH FILES ---------------- */
 
@@ -42,9 +44,9 @@ export function ImageSelector({ product, setProduct }: Props) {
 
   /* ---------------- FILTER ---------------- */
 
-  const filtered = files.filter((f) =>
-    f.url.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filtered = files
+    .filter((f) => /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(f.url)) // ✅ solo imágenes
+    .filter((f) => f.url.toLowerCase().includes(search.toLowerCase()));
 
   /* ---------------- SAVE PRODUCT ---------------- */
 
@@ -132,7 +134,7 @@ export function ImageSelector({ product, setProduct }: Props) {
       {/* 📂 GALERÍA CON PREVIEWS */}
       <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold">
-          Imágenes disponibles ({filtered.length})
+          Imágenes disponibles en el Servidor ({filtered.length})
         </label>
         {filtered.length > 0 ? (
           <div className="grid grid-cols-4 gap-4 md:grid-cols-6 lg:grid-cols-8">
@@ -185,7 +187,7 @@ export function ImageSelector({ product, setProduct }: Props) {
       {/* 🧾 IMÁGENES DEL PRODUCTO */}
       <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold">
-          Imágenes del producto ({product.images?.length || 0})
+          Imágenes del Producto ({product.images?.length || 0})
         </label>
         {product.images && product.images.length > 0 ? (
           <div className="flex flex-wrap gap-4">
@@ -211,28 +213,6 @@ export function ImageSelector({ product, setProduct }: Props) {
             No hay imágenes en el producto
           </p>
         )}
-      </div>
-
-      {/* 🗑 DELETE STORAGE */}
-      <div className="flex flex-col gap-3 border-t pt-4">
-        <h3 className="font-semibold text-sm">Eliminar del storage</h3>
-
-        <select
-          value={selectedDelete}
-          onChange={(e) => setSelectedDelete(e.target.value)}
-          className="p-2 border rounded dark:bg-gray-800"
-        >
-          <option value="">Seleccionar archivo para eliminar</option>
-          {files.map((file) => (
-            <option key={file.key} value={file.url}>
-              {file.url.split("/").pop()}
-            </option>
-          ))}
-        </select>
-
-        <Button variant="destructive" onClick={deleteFromStorage}>
-          Eliminar del storage
-        </Button>
       </div>
     </div>
   );

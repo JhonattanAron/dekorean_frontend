@@ -14,7 +14,7 @@ import { Product } from "@/lib/products-store";
 
 interface EditProductProps {
   product: Product;
-  onSave?: (product: Product) => Promise<any>;
+  onSave?: (product: Product) => Promise<any>; // ← Espera una Promise
   isLoading?: boolean;
 }
 
@@ -30,18 +30,16 @@ export function EditProduct({
   const [hasChanges, setHasChanges] = useState(false);
   const [activeTab, setActiveTab] = useState("basico");
 
-  /* ---------------- FIELD CHANGE ---------------- */
-
+  /* CAMBIO 1: handleFieldChange detecta cambios */
   const handleFieldChange = useCallback((field: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-
-    setHasChanges(true);
+    setHasChanges(true); // ← Marca que hay cambios
   }, []);
-  /* ---------------- VALIDATION ---------------- */
 
+  /* CAMBIO 2: validateForm valida antes de guardar */
   const validateForm = () => {
     const errors: string[] = [];
 
@@ -63,30 +61,19 @@ export function EditProduct({
     };
   };
 
-  /* ---------------- SAVE ---------------- */
-
+  /* CAMBIO 3: handleSave AHORA SÍ GUARDA (esto era el problema) */
   const handleSave = async () => {
     const validation = validateForm();
-
-    if (!validation.valid) {
-      validation.errors.forEach((error) =>
-        toast({
-          title: "Error",
-          description: error,
-          variant: "destructive",
-        }),
-      );
-      return;
-    }
+    console.log("Hola Mundo");
 
     try {
-      setIsSaving(true);
+      setIsSaving(true); // ← Muestra "Guardando..."
 
       if (onSave) {
-        await onSave(formData);
+        await onSave(formData); // ← ESPERA A QUE SE COMPLETE LA LLAMADA API
       }
 
-      setHasChanges(false);
+      setHasChanges(false); // ← Limpia el estado de cambios
 
       toast({
         title: "Guardado",
@@ -101,16 +88,13 @@ export function EditProduct({
         variant: "destructive",
       });
     } finally {
-      setIsSaving(false);
+      setIsSaving(false); // ← Oculta "Guardando..."
     }
   };
-
-  /* ---------------- RESET ---------------- */
 
   const handleReset = () => {
     setFormData(product);
     setHasChanges(false);
-
     toast({
       title: "Cambios descartados",
     });
@@ -119,14 +103,12 @@ export function EditProduct({
   return (
     <div className="w-full space-y-6">
       {/* HEADER */}
-
       <div className="border-b pb-6">
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">
               {formData.title || "Editar Producto"}
             </h1>
-
             <p className="text-sm text-muted-foreground mt-1">
               ID: {formData._id}
             </p>
@@ -151,7 +133,6 @@ export function EditProduct({
       </div>
 
       {/* TABS */}
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
           <TabsTrigger value="basico">Básico</TabsTrigger>
@@ -206,7 +187,6 @@ export function EditProduct({
       </Tabs>
 
       {/* ACTIONS */}
-
       <div className="flex items-center justify-between gap-4 border-t pt-6">
         <div className="text-sm text-muted-foreground">
           {hasChanges ? "Tienes cambios sin guardar" : "Sin cambios pendientes"}

@@ -86,7 +86,7 @@ export default function StorageGallery() {
     fetchFiles();
   };
 
-  const isImage = (url: string) => /\.(jpg|jpeg|png|webp|gif)$/i.test(url);
+  const isImage = (url: string) => /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(url);
   const isVideo = (url: string) => /\.(mp4|webm|mov)$/i.test(url);
   const isAudio = (url: string) => /\.(mp3|wav|m4a|ogg)$/i.test(url);
 
@@ -221,11 +221,13 @@ export default function StorageGallery() {
                 >
                   {/* Preview Container */}
                   <div className="relative w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 overflow-hidden flex items-center justify-center">
-                    <img
-                      src={file.url}
-                      alt={getFileName(file.key)}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
+                    {isImage(file.url) && (
+                      <img
+                        src={file.url}
+                        alt={getFileName(file.key)}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    )}
 
                     {isVideo(file.url) && (
                       <video
@@ -285,11 +287,13 @@ export default function StorageGallery() {
             <div className="p-8">
               {/* Preview */}
               <div className="mb-8 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 overflow-hidden flex items-center justify-center min-h-64">
-                <img
-                  src={selectedFile.url}
-                  alt={getFileName(selectedFile.key)}
-                  className="w-full h-auto object-contain max-h-96"
-                />
+                {isImage(selectedFile.url) && (
+                  <img
+                    src={selectedFile.url}
+                    alt={getFileName(selectedFile.key)}
+                    className="w-full h-auto object-contain max-h-96"
+                  />
+                )}
 
                 {isVideo(selectedFile.url) && (
                   <video
