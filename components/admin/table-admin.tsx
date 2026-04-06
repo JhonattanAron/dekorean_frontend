@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { CategoryInput } from "../edit-product/catgeoryInput";
+import Link from "next/link";
 
 interface SubCategory {
   _id: string;
@@ -216,6 +217,12 @@ export default function ProductsTable() {
 
       {/* ========== ACTIONS ========== */}
       <div className="flex flex-wrap gap-3">
+        <Link
+          href="/admin/aron/product/create"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          ➕ Crear Nuevo Producto
+        </Link>
         <button
           onClick={() => setOpenBulkModal(true)}
           disabled={selectedIds.length === 0}

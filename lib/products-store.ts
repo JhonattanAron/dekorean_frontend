@@ -56,6 +56,34 @@ export interface Product {
   updatedAt: string;
   imagesUpdated: boolean;
 }
+export interface ProductCreate {
+  brand: string;
+  category: string[];
+  claims: string[];
+
+  contentSize: string;
+  deliveryTime: string;
+
+  description?: Description;
+
+  dimensions?: Record<string, any>;
+
+  features: string[];
+  images: string[];
+  mainImage: string;
+
+  inStock: boolean;
+  stock?: number;
+
+  price?: Price;
+  price_per_m2: number;
+  reviews?: Reviews;
+  slug: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  imagesUpdated: boolean;
+}
 
 interface ProductsStore {
   products: Product[];

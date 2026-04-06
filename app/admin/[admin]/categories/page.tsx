@@ -48,6 +48,7 @@ export default function AdminPage() {
   const handleEdit = (category: Category) => {
     setSelectedCategory(category);
     setShowEditModal(true);
+    fetchCategories();
   };
 
   const handleDelete = async (id: string) => {
@@ -65,16 +66,19 @@ export default function AdminPage() {
     } catch (error) {
       console.error("error eliminando categoria", error);
     }
+    fetchCategories();
   };
 
   const handleCreated = async () => {
     await fetchCategories(); // 🔥 sync total
     setShowCreateModal(false);
+    fetchCategories();
   };
 
   const handleUpdated = async () => {
     await fetchCategories(); // 🔥 sync total
     setShowEditModal(false);
+    fetchCategories();
   };
 
   return (
