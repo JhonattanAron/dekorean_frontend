@@ -1,0 +1,11 @@
+<!-- ================= HERO VIDEO + LOGO (fade in/out 2s) ================= -->
+<!-- ================= HEADER SOLO EN ESCRITORIO ================= -->
+<!-- ================= LOGO DE LA NAVBAR DE ESCRITORIO ================= -->
+              <!-- ================= NAVBAR RESTAURANTES ================= -->
+<!-- ================= Seccion 1 despues de header ================= -->
+                <!-- VIDEO 1 -->
+      <!-- ================= Menu ================= -->
+   <!-- ====== FIN DEL MENU ====== -->
+      <!-- ====== Donde Estamos ====== -->
+            <!-- ====== Galeria de Imagenes ====== -->
+            <!-- ===== CARRUSEL INFINITO DE LOGOS (6 visibles) ===== -->

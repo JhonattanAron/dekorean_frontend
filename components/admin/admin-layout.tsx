@@ -43,6 +43,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <a href="/admin/aron/storage" className="px-2 py-1 hover:underline">
             Storage
           </a>
+          <a href="/admin/aron/host" className="px-2 py-1 hover:underline">
+            Lading Pages
+          </a>
         </nav>
         <ThemeToggle />
       </aside>
