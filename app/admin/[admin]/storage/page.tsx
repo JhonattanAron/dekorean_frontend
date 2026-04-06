@@ -10,6 +10,7 @@ import {
   Music,
   File,
   X,
+  Link2,
 } from "lucide-react";
 import AdminLayout from "@/components/admin/admin-layout";
 
@@ -30,6 +31,8 @@ export default function StorageGallery() {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [showLinksModal, setShowLinksModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -128,6 +131,39 @@ export default function StorageGallery() {
 
     setSelectedFile(null);
     fetchFiles();
+  };
+
+  const toggleFileSelection = (key: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newSelected = new Set(selectedFiles);
+    if (newSelected.has(key)) {
+      newSelected.delete(key);
+    } else {
+      newSelected.add(key);
+    }
+    setSelectedFiles(newSelected);
+  };
+
+  const toggleAllFiles = () => {
+    if (selectedFiles.size === filteredFiles.length) {
+      setSelectedFiles(new Set());
+    } else {
+      setSelectedFiles(new Set(filteredFiles.map((f) => f.key)));
+    }
+  };
+
+  const getSelectedUrls = () => {
+    return filteredFiles
+      .filter((f) => selectedFiles.has(f.key))
+      .map((f) => f.url);
+  };
+
+  const copyLinksAsArray = async () => {
+    const urls = getSelectedUrls();
+    const arrayText = JSON.stringify(urls, null, 2);
+    await navigator.clipboard.writeText(arrayText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const isImage = (url: string) => /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(url);
@@ -296,6 +332,63 @@ export default function StorageGallery() {
           )}
         </div>
 
+        {/* Selection Toolbar */}
+        {filteredFiles.length > 0 && !loading && (
+          <div className="mb-8 flex flex-wrap items-center gap-3 bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={
+                  selectedFiles.size === filteredFiles.length &&
+                  filteredFiles.length > 0
+                }
+                onChange={toggleAllFiles}
+                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Seleccionar todo
+              </span>
+            </label>
+
+            <div className="h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
+
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {selectedFiles.size}{" "}
+              {selectedFiles.size === 1 ? "archivo" : "archivos"} seleccionado
+              {selectedFiles.size === 1 ? "" : "s"}
+            </span>
+
+            {selectedFiles.size > 0 && (
+              <>
+                <button
+                  onClick={() => setShowLinksModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors duration-200"
+                >
+                  <Link2 className="w-4 h-4" />
+                  Ver enlaces ({selectedFiles.size})
+                </button>
+
+                <button
+                  onClick={copyLinksAsArray}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium text-sm transition-colors duration-200"
+                >
+                  {copied ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      Copiado
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Copiar array
+                    </>
+                  )}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Loading State */}
         {loading && (
           <div className="text-center py-16">
@@ -331,11 +424,21 @@ export default function StorageGallery() {
               {filteredFiles.map((file) => (
                 <div
                   key={file.key}
-                  onClick={() => setSelectedFile(file)}
-                  className="group cursor-pointer rounded-2xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 overflow-hidden hover:shadow-xl hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 hover:-translate-y-1"
+                  className="group relative rounded-2xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 overflow-hidden hover:shadow-xl hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
+                  {/* Checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={selectedFiles.has(file.key)}
+                    onChange={(e) => toggleFileSelection(file.key, e as any)}
+                    className="absolute top-3 left-3 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer z-10"
+                  />
+
                   {/* Preview Container */}
-                  <div className="relative w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 overflow-hidden flex items-center justify-center">
+                  <div
+                    onClick={() => setSelectedFile(file)}
+                    className="relative w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 overflow-hidden flex items-center justify-center"
+                  >
                     {isImage(file.url) && (
                       <img
                         src={file.url}
@@ -374,7 +477,7 @@ export default function StorageGallery() {
           </>
         )}
 
-        {/* Modal */}
+        {/* Modal - Detalles del Archivo */}
         {selectedFile && (
           <div
             onClick={() => setSelectedFile(null)}
@@ -497,6 +600,112 @@ export default function StorageGallery() {
                     Cerrar
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal - Enlaces de archivos seleccionados */}
+        {showLinksModal && (
+          <div
+            onClick={() => setShowLinksModal(false)}
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-gray-900 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+            >
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-gradient-to-r from-green-50 to-green-100 dark:from-gray-800 dark:to-gray-700 p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Enlaces de archivos
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    {selectedFiles.size}{" "}
+                    {selectedFiles.size === 1 ? "archivo" : "archivos"}{" "}
+                    seleccionado{selectedFiles.size === 1 ? "" : "s"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowLinksModal(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-8">
+                {/* Array Format */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Formato Array (JSON)
+                  </label>
+                  <div className="relative">
+                    <textarea
+                      value={JSON.stringify(getSelectedUrls(), null, 2)}
+                      readOnly
+                      className="w-full h-48 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                    />
+                  </div>
+                  <button
+                    onClick={copyLinksAsArray}
+                    className="mt-3 flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium text-sm transition-colors duration-200 w-full justify-center"
+                  >
+                    {copied ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4" />
+                        Copiado al portapapeles
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        Copiar array
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Individual Links */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Enlaces individuales
+                  </label>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {getSelectedUrls().map((url, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 group"
+                      >
+                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 flex-shrink-0">
+                          [{index + 1}]
+                        </span>
+                        <input
+                          type="text"
+                          value={url}
+                          readOnly
+                          className="flex-1 bg-transparent text-gray-900 dark:text-gray-300 text-xs font-mono focus:outline-none truncate"
+                        />
+                        <button
+                          onClick={() => copyToClipboard(url)}
+                          className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100"
+                          title="Copiar enlace"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowLinksModal(false)}
+                  className="w-full mt-6 px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           </div>
