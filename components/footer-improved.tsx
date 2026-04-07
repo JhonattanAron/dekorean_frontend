@@ -1,6 +1,16 @@
-'use client'
+"use client";
 
-import { Instagram, Linkedin, Mail, Phone } from 'lucide-react'
+import {
+  Cookie,
+  FileText,
+  Instagram,
+  Linkedin,
+  Mail,
+  Phone,
+  RotateCcw,
+  Shield,
+} from "lucide-react";
+import Link from "next/link";
 
 export function FooterImproved() {
   return (
@@ -12,7 +22,8 @@ export function FooterImproved() {
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-white">DEKORANS</h3>
             <p className="text-sm text-white/60">
-              Paneles acústicos y decorativos innovadores para transformar tu espacio.
+              Paneles acústicos y decorativos innovadores para transformar tu
+              espacio.
             </p>
             <div className="flex gap-3">
               <a
@@ -41,25 +52,39 @@ export function FooterImproved() {
 
           {/* Products */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">Productos</h4>
+            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">
+              Productos
+            </h4>
             <ul className="space-y-2">
               <li>
-                <a href="/productos" className="text-sm text-white/60 hover:text-primary transition-colors">
+                <a
+                  href="/productos"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
                   Paneles Premium
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
+                <a
+                  href="#"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
                   3D Texturizados
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
+                <a
+                  href="#"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
                   Difusores Acústicos
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
+                <a
+                  href="#"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
                   Catálogo Completo
                 </a>
               </li>
@@ -68,25 +93,39 @@ export function FooterImproved() {
 
           {/* Company */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">Empresa</h4>
+            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">
+              Empresa
+            </h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
+                <a
+                  href="#"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
                   Acerca de Nosotros
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
+                <a
+                  href="#"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
                   Blog
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
+                <a
+                  href="#"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
                   Empleos
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
+                <a
+                  href="#"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
                   Prensa
                 </a>
               </li>
@@ -95,26 +134,48 @@ export function FooterImproved() {
 
           {/* Support */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">Soporte</h4>
-            <ul className="space-y-2">
+            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">
+              Documentos Legales
+            </h4>
+            <ul>
               <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
-                  Centro de Ayuda
+                <a
+                  href="/legal/terminos-servicio"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
+                  Términos de Servicio
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
-                  Envíos
+                <a
+                  href="/legal/privacidad"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
+                  Privacidad
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
+                <a
+                  href="/legal/cookies"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
+                  Cookies
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/legal/aviso-legal"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
+                  Aviso Legal
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/legal/devolucion"
+                  className="text-sm text-white/60 hover:text-primary transition-colors"
+                >
                   Devoluciones
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm text-white/60 hover:text-primary transition-colors">
-                  Contacto
                 </a>
               </li>
             </ul>
@@ -134,9 +195,11 @@ export function FooterImproved() {
               Política de Cookies
             </a>
           </div>
-          <div className="text-sm text-white/50">© 2024 DEKORANS. Todos los derechos reservados.</div>
+          <div className="text-sm text-white/50">
+            © 2024 DEKORANS. Todos los derechos reservados.
+          </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }
