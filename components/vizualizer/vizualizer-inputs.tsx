@@ -1,22 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ImageModal } from "./image-modal";
 import { useImageSelectionStore } from "@/lib/use-image-selector-store";
-import { Trash2, CheckCircle2, Loader2, Wand2 } from "lucide-react";
-import { AIDesignModal } from "./ai-desing-modal";
+import { Trash2, CheckCircle2 } from "lucide-react";
 import { CreditCounter } from "./credit-counter";
 
+export interface SelectedImageType {
+  imageUrl: string;
+  productTitle: string;
+  price?: number;
+  [key: string]: any;
+}
+
+export interface SelectionPayload {
+  images: (SelectedImageType & { role: string })[];
+  placement: string;
+}
+
 const CATEGORIES = [
-  {
-    id: "cocinas",
-    label: "Cocinas",
-    icon: "🍳",
-    color: "from-orange-500 to-red-500",
-  },
   {
     id: "paneles",
     label: "Paneles",
@@ -31,10 +36,16 @@ const CATEGORIES = [
   },
 ];
 
-export function ProductSidebarInputs() {
+interface ProductSidebarInputsProps {
+  onSelectionChange?: (data: SelectionPayload) => void;
+}
+
+export function ProductSidebarInputs({
+  onSelectionChange,
+}: ProductSidebarInputsProps) {
   const [openModals, setOpenModals] = useState<Record<string, boolean>>({});
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [showAIModal, setShowAIModal] = useState(false);
+  const [placementText, setPlacementText] = useState("");
+  const [roles, setRoles] = useState<Record<string, string>>({});
 
   const selectedImages = useImageSelectionStore(
     (state) => state.selectedImages,
@@ -42,21 +53,34 @@ export function ProductSidebarInputs() {
 
   const selectedCount = Object.keys(selectedImages).length;
 
+  // 🔥 Enviar data al padre
+  useEffect(() => {
+    if (onSelectionChange) {
+      const selectedArray = Object.entries(selectedImages)
+        .slice(0, 3)
+        .map(([categoryId, img]) => ({
+          ...img,
+          role:
+            roles[categoryId] ||
+            (categoryId === "paneles" ? "panel pared" : "planta decorativa"),
+        }));
+
+      onSelectionChange({
+        images: selectedArray,
+        placement: placementText,
+      });
+    }
+  }, [selectedImages, placementText, roles]);
+
   const toggleModal = (categoryId: string) => {
     setOpenModals((prev) => ({
       ...prev,
       [categoryId]: !prev[categoryId],
     }));
   };
-
-  const handleGenerateDesign = async (prompt: string) => {
-    setIsGenerating(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      console.log("Design generated with AI:", prompt);
-    } finally {
-      setIsGenerating(false);
-    }
+  const DEFAULT_ROLES: Record<string, string> = {
+    paneles: "panel decorativo de pared",
+    plantas: "planta decorativa interior",
   };
 
   return (
@@ -67,11 +91,26 @@ export function ProductSidebarInputs() {
           Selector de Componentes
         </h2>
         <p className="text-sm text-slate-300">
-          Selecciona elementos para personalizar tu diseño ({selectedCount}/3)
+          Selecciona elementos ({selectedCount}/3)
         </p>
       </div>
+
       <CreditCounter />
-      {/* 🔥 SCROLL SOLO AQUÍ */}
+
+      {/* 🔥 INPUT DE UBICACIÓN */}
+      <div className="mt-4 space-y-2">
+        <label className="text-sm text-slate-300 font-semibold">
+          ¿Dónde quieres colocar los elementos?
+        </label>
+        <textarea
+          value={placementText}
+          onChange={(e) => setPlacementText(e.target.value)}
+          placeholder="Ej: Paneles en la pared izquierda, planta en la esquina derecha..."
+          className="w-full h-20 p-3 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        />
+      </div>
+
+      {/* SCROLL */}
       <div className="flex-1 overflow-y-auto pr-2 space-y-4 mt-4">
         {CATEGORIES.map((category) => {
           const selectedImage = selectedImages[category.id];
@@ -79,7 +118,7 @@ export function ProductSidebarInputs() {
 
           return (
             <div key={category.id} className="space-y-2">
-              {/* Category Header */}
+              {/* HEADER */}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-slate-200">
                   {category.icon} {category.label}
@@ -94,47 +133,49 @@ export function ProductSidebarInputs() {
                 )}
               </div>
 
-              {/* Preview */}
+              {/* PREVIEW */}
               {isSelected && selectedImage ? (
-                <Card className="p-3 bg-gradient-to-br from-slate-700/50 to-slate-800/50 overflow-hidden border border-slate-600/50">
-                  <div className="space-y-2">
-                    <div
-                      className={`relative w-full h-28 bg-gradient-to-br ${category.color} rounded-lg overflow-hidden`}
-                    >
-                      <img
-                        src={selectedImage.imageUrl}
-                        alt={selectedImage.productTitle}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="text-xs space-y-1">
-                      <p className="font-semibold text-slate-100 truncate">
-                        {selectedImage.productTitle}
-                      </p>
-                      {selectedImage.price && (
-                        <p className="text-slate-400">
-                          ${selectedImage.price.toFixed(2)}
-                        </p>
-                      )}
-                    </div>
+                <>
+                  <Card className="p-3 bg-slate-700/50 border border-slate-600/50">
+                    <img
+                      src={selectedImage.imageUrl}
+                      className="w-full h-28 object-cover rounded-lg"
+                    />
+                    <p className="text-xs text-slate-200 mt-2 truncate">
+                      {selectedImage.productTitle}
+                    </p>
+                  </Card>
+
+                  {/* 🔥 INPUT ROLE */}
+                  <div className="space-y-1">
+                    <label className="text-xs text-slate-400">Role</label>
+                    <textarea
+                      value={
+                        roles[category.id] ?? DEFAULT_ROLES[category.id] ?? ""
+                      }
+                      onChange={(e) =>
+                        setRoles((prev) => ({
+                          ...prev,
+                          [category.id]: e.target.value,
+                        }))
+                      }
+                      placeholder="Ej: panel lateral moderno, planta decorativa..."
+                      className="w-full h-16 p-2 rounded-lg bg-slate-800 border border-slate-600 text-white text-xs resize-none focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    />
                   </div>
-                </Card>
+                </>
               ) : (
-                <div
-                  className={`w-full h-28 bg-gradient-to-br ${category.color} bg-opacity-10 rounded-lg flex items-center justify-center border-2 border-dashed border-slate-600/50`}
-                >
-                  <span className="text-xs text-slate-400 text-center px-2">
-                    Sin seleccionar elemento
-                  </span>
+                <div className="w-full h-28 border-2 border-dashed border-slate-600 rounded-lg flex items-center justify-center text-xs text-slate-400">
+                  Sin seleccionar
                 </div>
               )}
 
-              {/* Actions */}
+              {/* ACTIONS */}
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1 bg-slate-700/50 border-slate-600/50 text-slate-100"
+                  className="flex-1"
                   onClick={() => toggleModal(category.id)}
                 >
                   {isSelected ? "Cambiar" : "Seleccionar"}
@@ -144,7 +185,6 @@ export function ProductSidebarInputs() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="px-3 text-red-400"
                     onClick={() => {
                       const newImages = { ...selectedImages };
                       delete newImages[category.id];
@@ -153,7 +193,7 @@ export function ProductSidebarInputs() {
                       });
                     }}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4 text-red-400" />
                   </Button>
                 )}
               </div>
@@ -169,46 +209,19 @@ export function ProductSidebarInputs() {
         })}
       </div>
 
-      {/* 🔥 FOOTER FIJO */}
-      <div className="pt-4 border-t border-slate-700/50 space-y-2">
+      {/* FOOTER */}
+      <div className="pt-4 border-t border-slate-700/50">
         <Button
-          onClick={() => setShowAIModal(true)}
-          disabled={isGenerating}
-          className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-lg flex items-center justify-center gap-2"
+          disabled={selectedCount === 0}
+          className="w-full bg-red-500/20 text-red-300"
+          onClick={() =>
+            useImageSelectionStore.setState({ selectedImages: {} })
+          }
         >
-          {isGenerating ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Generando...
-            </>
-          ) : (
-            <>
-              <Wand2 className="w-5 h-5" />
-              Generar Diseño con IA
-            </>
-          )}
+          <Trash2 className="w-4 h-4 mr-2" />
+          Limpiar Todo
         </Button>
-
-        {selectedCount > 0 && (
-          <Button
-            variant="secondary"
-            size="sm"
-            className="w-full bg-red-500/20 border border-red-500/50 text-red-300"
-            onClick={() =>
-              useImageSelectionStore.setState({ selectedImages: {} })
-            }
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Limpiar Todo
-          </Button>
-        )}
       </div>
-
-      <AIDesignModal
-        open={showAIModal}
-        onOpenChange={setShowAIModal}
-        onGenerate={handleGenerateDesign}
-      />
     </div>
   );
 }

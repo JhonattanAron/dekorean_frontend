@@ -55,16 +55,16 @@ export function UploadBox({
     }
   };
 
-  // 🔥 FUNCIÓN REAL (arreglada)
   const handleUpload = async (file: File) => {
-    if (loading) return; // 🔥 evita doble ejecución
+    if (loading) return;
+
     try {
       setLoading(true);
 
+      // 🔥 1. SUBIR IMAGEN
       const formData = new FormData();
       formData.append("file", file);
 
-      // 1. subir imagen
       const uploadRes = await fetch("/api/backend/storage/upload", {
         method: "POST",
         body: formData,
@@ -72,25 +72,32 @@ export function UploadBox({
 
       if (!uploadRes.ok) throw new Error("Error subiendo imagen");
 
-      const { url } = await uploadRes.json();
+      const uploadData = await uploadRes.json();
 
-      // 2. crear proyecto
-      const projectRes = await fetch("/api/backend/users-projects", {
+      const imageUrl = uploadData.url.url; // 👈 importante
+      console.log("Imagen subida:", imageUrl);
+
+      // 🔥 2. CREAR PROYECTO (VERSIÓN 1 AUTOMÁTICA)
+      const projectRes = await fetch("/api/backend/projects", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          imageUrl: url,
-          name: "Mi proyecto", // 🔥 puedes cambiar luego
+          imageUrl,
+          userId: "demo-user", // 🔥 luego lo sacas de auth
         }),
       });
 
       if (!projectRes.ok) throw new Error("Error creando proyecto");
 
-      const project = await projectRes.json();
+      const projectData = await projectRes.json();
 
-      // 3. redirigir
+      const project = projectData.data; // 👈 porque tu controller devuelve { success, data }
+
+      console.log("Proyecto creado:", project);
+
+      // 🔥 3. REDIRIGIR AL VISUALIZER
       router.push(`/visualizer/${project._id}`);
     } catch (error) {
       console.error(error);
