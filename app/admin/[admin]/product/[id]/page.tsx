@@ -21,8 +21,10 @@ export default function EditProductPage() {
     async function load() {
       const data = await getProductByIdAdmin(id as string);
 
-      if (data) {
+      if (data && typeof data === "object" && data._id) {
         setProduct(data);
+      } else {
+        setProduct(null);
       }
 
       setLoading(false);

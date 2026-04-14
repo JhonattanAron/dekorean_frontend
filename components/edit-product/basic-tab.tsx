@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { BundleAdmin } from "./admin-packs";
 
 interface BasicTabProps {
   formData: any;
@@ -10,7 +11,11 @@ interface BasicTabProps {
   isLoading?: boolean;
 }
 
-export function BasicTab({ formData, onChange, isLoading = false }: BasicTabProps) {
+export function BasicTab({
+  formData,
+  onChange,
+  isLoading = false,
+}: BasicTabProps) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -19,8 +24,8 @@ export function BasicTab({ formData, onChange, isLoading = false }: BasicTabProp
             Título *
           </label>
           <Input
-            value={formData.title || ''}
-            onChange={(e) => onChange('title', e.target.value)}
+            value={formData.title || ""}
+            onChange={(e) => onChange("title", e.target.value)}
             placeholder="Nombre del producto"
             disabled={isLoading}
             className="focus:ring-2 focus:ring-blue-500"
@@ -32,8 +37,8 @@ export function BasicTab({ formData, onChange, isLoading = false }: BasicTabProp
             Marca *
           </label>
           <Input
-            value={formData.brand || ''}
-            onChange={(e) => onChange('brand', e.target.value)}
+            value={formData.brand || ""}
+            onChange={(e) => onChange("brand", e.target.value)}
             placeholder="Marca"
             disabled={isLoading}
           />
@@ -46,8 +51,8 @@ export function BasicTab({ formData, onChange, isLoading = false }: BasicTabProp
             Slug *
           </label>
           <Input
-            value={formData.slug || ''}
-            onChange={(e) => onChange('slug', e.target.value)}
+            value={formData.slug || ""}
+            onChange={(e) => onChange("slug", e.target.value)}
             placeholder="url-amigable"
             disabled={isLoading}
           />
@@ -58,8 +63,8 @@ export function BasicTab({ formData, onChange, isLoading = false }: BasicTabProp
             Tamaño de Contenido *
           </label>
           <Input
-            value={formData.contentSize || ''}
-            onChange={(e) => onChange('contentSize', e.target.value)}
+            value={formData.contentSize || ""}
+            onChange={(e) => onChange("contentSize", e.target.value)}
             placeholder="Ej: 500ml, 1L, 1kg"
             disabled={isLoading}
           />
@@ -72,8 +77,8 @@ export function BasicTab({ formData, onChange, isLoading = false }: BasicTabProp
             Tiempo de Entrega *
           </label>
           <Input
-            value={formData.deliveryTime || ''}
-            onChange={(e) => onChange('deliveryTime', e.target.value)}
+            value={formData.deliveryTime || ""}
+            onChange={(e) => onChange("deliveryTime", e.target.value)}
             placeholder="Ej: 2-3 días, 1 semana"
             disabled={isLoading}
           />
@@ -84,11 +89,15 @@ export function BasicTab({ formData, onChange, isLoading = false }: BasicTabProp
             Precio por m²
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-3 text-muted-foreground">$</span>
+            <span className="absolute left-3 top-3 text-muted-foreground">
+              $
+            </span>
             <Input
               type="number"
-              value={formData.price_per_m2 || ''}
-              onChange={(e) => onChange('price_per_m2', parseFloat(e.target.value) || 0)}
+              value={formData.price_per_m2 || ""}
+              onChange={(e) =>
+                onChange("price_per_m2", parseFloat(e.target.value) || 0)
+              }
               placeholder="0.00"
               disabled={isLoading}
               className="pl-7"
@@ -101,7 +110,7 @@ export function BasicTab({ formData, onChange, isLoading = false }: BasicTabProp
       {/* Stock Toggle */}
       <div className="border-t pt-6 space-y-4">
         <h3 className="text-sm font-semibold text-foreground">Estado</h3>
-        
+
         <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
           <div className="space-y-1">
             <p className="font-medium text-foreground">En Stock</p>
@@ -111,11 +120,17 @@ export function BasicTab({ formData, onChange, isLoading = false }: BasicTabProp
           </div>
           <Switch
             checked={formData.inStock !== false}
-            onCheckedChange={(checked) => onChange('inStock', checked)}
+            onCheckedChange={(checked) => onChange("inStock", checked)}
             disabled={isLoading}
           />
         </div>
       </div>
+      <BundleAdmin
+        tiers={formData.packs || []}
+        basePrice={formData.price.current}
+        productName={formData.title}
+        onChange={(tiers) => onChange("packs", tiers)}
+      />
     </div>
   );
 }

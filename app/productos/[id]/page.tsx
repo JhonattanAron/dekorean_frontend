@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "next/navigation";
 import { ProductDescription } from "@/components/product/ProductDescription";
 import LayoutPage from "@/components/layoutPage";
+import { BundleTier } from "@/components/edit-product/admin-packs";
 
 interface Product {
   _id: string;
@@ -45,6 +46,7 @@ interface Product {
     count: number;
   };
   videoUrl?: string;
+  packs?: BundleTier[];
 }
 
 export default function ProductPage() {
@@ -81,6 +83,8 @@ export default function ProductPage() {
 
     fetchProduct();
   }, [id]);
+
+  console.log(product);
 
   /* ================= LOADING ================= */
   if (loading) {
@@ -186,6 +190,8 @@ export default function ProductPage() {
               }
               category={product.category?.[0]}
               currency={product.price.currency}
+              basePrice={product.price.current}
+              tiers={product.packs || []}
             />
           </div>
 

@@ -34,11 +34,11 @@ import {
 } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, X } from "lucide-react";
-
+import { GripVertical, X, Play } from "lucide-react";
 interface Props {
-  product: Product;
-  setProduct: (p: Product) => void;
+  formData: any;
+  onChange: (field: string, value: any) => void;
+  isLoading?: boolean;
 }
 
 type FileItem = {
@@ -46,9 +46,9 @@ type FileItem = {
   url: string;
 };
 
-/* ==================== SORTABLE IMAGE ITEM ==================== */
+/* ==================== SORTABLE VIDEO ITEM ==================== */
 
-function SortableImageItem({
+function SortableVideoItem({
   id,
   url,
   onRemove,
@@ -86,11 +86,9 @@ function SortableImageItem({
         <GripVertical className="w-5 h-5" />
       </button>
 
-      <img
-        src={url}
-        alt="producto"
-        className="w-12 h-12 object-cover rounded"
-      />
+      <div className="w-12 h-12 bg-gray-900 rounded flex items-center justify-center flex-shrink-0">
+        <Play className="w-5 h-5 text-white fill-white" />
+      </div>
 
       <span className="flex-1 text-sm text-gray-600 truncate">{url}</span>
 
@@ -106,14 +104,14 @@ function SortableImageItem({
 
 /* ==================== MAIN COMPONENT ==================== */
 
-export function ImageSelector({ product, setProduct }: Props) {
+export function VideoSelector({ formData, onChange, isLoading }: Props) {
   const { updateProduct } = useProductsStore();
 
   const [files, setFiles] = useState<FileItem[]>([]);
   const [search, setSearch] = useState("");
   const [selectedUrl, setSelectedUrl] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+  const [hoveredVideo, setHoveredVideo] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -142,90 +140,62 @@ export function ImageSelector({ product, setProduct }: Props) {
 
   const filtered = [...files] // 👈 CLONAR ARRAY
     .sort((a, b) => b.key.localeCompare(a.key)) // 👈 ORDENAR
-    .filter((f) => /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(f.url))
+
+    .filter((f) => /\.(mp4|webm|mov|avi|mkv|flv|wmv|m4v)$/i.test(f.url))
     .filter((f) => f.url.toLowerCase().includes(search.toLowerCase()));
 
-  /* ==================== SAVE PRODUCT ==================== */
-
-  async function saveProduct(updated: Product) {
-    await fetch(`/api/backend/products/${product._id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        images: updated.images,
-        mainImage: updated.mainImage,
-      }),
-    });
-
-    updateProduct(product._id, updated);
-  }
-
-  /* ==================== ADD IMAGE ==================== */
-
-  async function addImage(url: string) {
+  /* ==================== ADD VIDEO ==================== */
+  const addVideo = (url: string) => {
     if (!url) return;
 
-    const newImages = [...(product.images || []), url];
+    if (formData.videos?.includes(url)) return; // evitar duplicados
 
-    const updated: Product = {
-      ...product,
-      images: newImages,
-      mainImage: product.mainImage || url,
-    };
+    const newVideos = [...(formData.videos || []), url];
 
-    setProduct(updated);
-    setSelectedUrl("");
+    onChange("videos", newVideos);
 
-    await saveProduct(updated);
-  }
+    if (!formData.mainVideo) {
+      onChange("mainVideo", url);
+    }
+  };
+  /* ==================== REMOVE VIDEO ==================== */
 
-  /* ==================== REMOVE IMAGE ==================== */
+  const removeVideo = (url: string) => {
+    const newVideos = (formData.videos || []).filter(
+      (vid: string) => vid !== url,
+    );
 
-  async function removeImage(url: string) {
-    const newImages = product.images.filter((img) => img !== url);
+    onChange("videos", newVideos);
 
-    const updated: Product = {
-      ...product,
-      images: newImages,
-      mainImage:
-        product.mainImage === url ? newImages[0] || "" : product.mainImage,
-    };
-
-    setProduct(updated);
-    await saveProduct(updated);
-  }
+    if (formData.mainVideo === url) {
+      onChange("mainVideo", newVideos[0] || "");
+    }
+  };
 
   /* ==================== HANDLE DRAG END ==================== */
 
   const handleDragEnd = useCallback(
-    async (event: DragEndEvent) => {
+    (event: DragEndEvent) => {
       const { active, over } = event;
 
-      if (over && active.id !== over.id) {
-        const oldIndex = product.images.indexOf(active.id as string);
-        const newIndex = product.images.indexOf(over.id as string);
+      if (over && active.id !== over.id && formData.videos) {
+        const oldIndex = formData.videos.indexOf(active.id as string);
+        const newIndex = formData.videos.indexOf(over.id as string);
 
-        const newImages = arrayMove(product.images, oldIndex, newIndex);
+        const newVideos = arrayMove(formData.videos, oldIndex, newIndex);
 
-        const updated: Product = {
-          ...product,
-          images: newImages,
-        };
-
-        setProduct(updated);
-        await saveProduct(updated);
+        onChange("videos", newVideos);
       }
     },
-    [product, setProduct, saveProduct],
+    [formData.videos, onChange],
   );
-
   /* ==================== UI ==================== */
 
   return (
     <div className="flex flex-col gap-6">
       {/* 🔍 BUSCADOR */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold">Buscar imagen</label>
+        <label className="text-sm font-semibold">Buscar video</label>
         <Input
           placeholder="Buscar por nombre..."
           value={search}
@@ -234,11 +204,11 @@ export function ImageSelector({ product, setProduct }: Props) {
         />
       </div>
 
-      {/* 📂 CARRUSEL DE IMÁGENES SERVIDOR */}
+      {/* 📂 CARRUSEL DE VIDEOS SERVIDOR */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <label className="text-sm font-semibold">
-            Imágenes disponibles en el Servidor ({filtered.length})
+            Videos disponibles en el Servidor ({filtered.length})
           </label>
           {filtered.length > 0 && (
             <Button
@@ -254,34 +224,47 @@ export function ImageSelector({ product, setProduct }: Props) {
         {filtered.length > 0 ? (
           <Carousel className="w-full">
             <CarouselContent>
-              {filtered.map((file) => (
-                <CarouselItem
-                  key={file.key}
-                  className="md:basis-1/4 lg:basis-1/6"
-                >
-                  <button
-                    onClick={() => addImage(file.url)}
-                    onMouseEnter={() => setHoveredImage(file.url)}
-                    onMouseLeave={() => setHoveredImage(null)}
-                    className="relative w-full aspect-square rounded-lg border-2 overflow-hidden transition-all border-gray-300 hover:border-blue-400"
-                  >
-                    <img
-                      src={file.url}
-                      alt={file.key}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-
-                    {hoveredImage === file.url && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="text-white text-xs text-center px-2">
-                          Click para agregar
-                        </span>
+              {filtered.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                  {filtered.map((file) => (
+                    <div
+                      key={file.key}
+                      className="border rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition"
+                    >
+                      {/* 🎬 VIDEO */}
+                      <div className="w-full aspect-video bg-black">
+                        <video
+                          src={file.url}
+                          className="w-full h-full object-cover"
+                          controls
+                          preload="metadata"
+                        />
                       </div>
-                    )}
-                  </button>
-                </CarouselItem>
-              ))}
+
+                      {/* 🔽 FOOTER */}
+                      <div className="p-3 flex flex-col gap-2">
+                        <p className="text-xs text-gray-500 truncate">
+                          {file.url}
+                        </p>
+
+                        <Button
+                          onClick={() => {
+                            addVideo(file.url);
+                            setIsModalOpen(false);
+                          }}
+                          className="w-full bg-blue-600 hover:bg-blue-500 text-white"
+                        >
+                          Agregar video
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  No hay videos disponibles
+                </div>
+              )}
             </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />
@@ -289,87 +272,89 @@ export function ImageSelector({ product, setProduct }: Props) {
         ) : (
           <div className="text-center py-8 text-gray-500">
             {search
-              ? "No hay imágenes que coincidan con tu búsqueda"
-              : "No hay imágenes disponibles"}
+              ? "No hay videos que coincidan con tu búsqueda"
+              : "No hay videos disponibles"}
           </div>
         )}
       </div>
 
-      {/* 🧾 IMÁGENES DEL PRODUCTO (REORDENABLES CON DRAG & DROP) */}
+      {/* 🧾 VIDEOS DEL PRODUCTO (REORDENABLES CON DRAG & DROP) */}
       <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold">
-          Imágenes del Producto ({product.images?.length || 0})
+          Videos del Producto ({formData.videos?.length || 0})
         </label>
-        {product.images && product.images.length > 0 ? (
+        {formData.videos && formData.videos.length > 0 ? (
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={product.images}
+              items={formData.videos}
               strategy={verticalListSortingStrategy}
             >
               <div className="flex flex-col gap-2">
-                {product.images.map((img) => (
-                  <SortableImageItem
-                    key={img}
-                    id={img}
-                    url={img}
-                    onRemove={removeImage}
+                {formData.videos.map((vid: string) => (
+                  <SortableVideoItem
+                    key={vid}
+                    id={vid}
+                    url={vid}
+                    onRemove={removeVideo}
                   />
                 ))}
               </div>
             </SortableContext>
           </DndContext>
         ) : (
-          <p className="text-gray-500 text-sm">
-            No hay imágenes en el producto
-          </p>
+          <p className="text-gray-500 text-sm">No hay videos en el producto</p>
         )}
       </div>
 
-      {/* 📂 MODAL CON TODAS LAS IMÁGENES SERVIDOR */}
+      {/* 📂 MODAL CON TODOS LOS VIDEOS SERVIDOR */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Todas las imágenes disponibles ({filtered.length})
+              Todos los videos disponibles ({filtered.length})
             </DialogTitle>
           </DialogHeader>
-
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-3 gap-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
               {filtered.map((file) => (
-                <button
+                <div
                   key={file.key}
-                  onClick={() => {
-                    addImage(file.url);
-                    setIsModalOpen(false);
-                  }}
-                  onMouseEnter={() => setHoveredImage(file.url)}
-                  onMouseLeave={() => setHoveredImage(null)}
-                  className="relative aspect-square rounded-lg border-2 overflow-hidden transition-all border-gray-300 hover:border-blue-400"
+                  className="border rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition"
                 >
-                  <img
-                    src={file.url}
-                    alt={file.key}
-                    className="w-full h-full object-cover"
-                  />
+                  {/* 🎬 VIDEO */}
+                  <div className="w-full aspect-video bg-black">
+                    <video
+                      src={file.url}
+                      className="w-full h-full object-cover"
+                      controls
+                      preload="metadata"
+                    />
+                  </div>
 
-                  {hoveredImage === file.url && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="text-white text-xs text-center px-2">
-                        Click para agregar
-                      </span>
-                    </div>
-                  )}
-                </button>
+                  {/* 🔽 FOOTER */}
+                  <div className="p-3 flex flex-col gap-2">
+                    <p className="text-xs text-gray-500 truncate">{file.url}</p>
+
+                    <Button
+                      onClick={() => {
+                        addVideo(file.url);
+                        setIsModalOpen(false);
+                      }}
+                      className="w-full bg-blue-600 hover:bg-blue-500 text-white"
+                    >
+                      Agregar video
+                    </Button>
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              No hay imágenes disponibles
+              No hay videos disponibles
             </div>
           )}
         </DialogContent>

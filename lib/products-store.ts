@@ -1,5 +1,6 @@
 "use client";
 
+import { BundleTier } from "@/components/edit-product/admin-packs";
 import { create } from "zustand";
 
 // Sub-interfaces basadas en tus sub-schemas
@@ -43,6 +44,7 @@ export interface Product {
   features: string[];
   images: string[];
   mainImage: string;
+  packs?: BundleTier[];
 
   inStock: boolean;
   stock?: number;
@@ -55,6 +57,8 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   imagesUpdated: boolean;
+  videos?: string[];
+  mainVideo?: string;
 }
 export interface ProductCreate {
   brand: string;

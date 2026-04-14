@@ -11,6 +11,7 @@ import { ImagesTab } from "./images-tab";
 import { AlertCircle, CheckCircle, Save } from "lucide-react";
 import { useToast } from "../ui/use-toast";
 import { Product } from "@/lib/products-store";
+import { VideoSelector } from "./video-selector";
 
 interface EditProductProps {
   product: Product;
@@ -29,6 +30,8 @@ export function EditProduct({
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [activeTab, setActiveTab] = useState("basico");
+
+  console.log(formData);
 
   /* CAMBIO 1: handleFieldChange detecta cambios */
   const handleFieldChange = useCallback((field: string, value: any) => {
@@ -178,6 +181,13 @@ export function EditProduct({
 
           <TabsContent value="imagenes">
             <ImagesTab
+              formData={formData}
+              onChange={handleFieldChange}
+              isLoading={isSaving || isLoading}
+            />
+          </TabsContent>
+          <TabsContent value="videos">
+            <VideoSelector
               formData={formData}
               onChange={handleFieldChange}
               isLoading={isSaving || isLoading}

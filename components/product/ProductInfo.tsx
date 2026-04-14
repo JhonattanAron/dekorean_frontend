@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Heart, ShoppingCart, Check } from "lucide-react";
+import { ProductBundles } from "./product-bundles";
 
 interface ProductInfoProps {
   name: string;
@@ -18,6 +19,11 @@ interface ProductInfoProps {
   description: string;
   category?: string;
   currency?: string;
+  basePrice: number;
+  tiers: {
+    quantity: number;
+    discountPercent: number;
+  }[];
 }
 
 export function ProductInfo({
@@ -30,6 +36,8 @@ export function ProductInfo({
   description,
   category,
   currency = "EUR",
+  basePrice,
+  tiers,
 }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
@@ -182,8 +190,9 @@ export function ProductInfo({
           </Button>
         </div>
       </div>
+      <ProductBundles basePrice={basePrice} bundles={tiers} />
 
-      {/* Shipping Info */}
+      {/* Shipping Info 
       <Card className="p-4 border-border/50 bg-muted/30">
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
@@ -194,12 +203,13 @@ export function ProductInfo({
             <span className="text-muted-foreground">Delivery Time</span>
             <span className="font-medium">3-5 business days</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Returns</span>
-            <span className="font-medium">30-day return policy</span>
           </div>
-        </div>
-      </Card>
+          </Card>
+          */}
+      <div className="flex justify-between text-sm">
+        <span className="text-muted-foreground">Returns</span>
+        <span className="font-medium">30-day return policy</span>
+      </div>
     </div>
   );
 }

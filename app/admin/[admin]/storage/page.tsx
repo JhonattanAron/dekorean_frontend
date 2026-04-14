@@ -176,9 +176,11 @@ export default function StorageGallery() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const filteredFiles = files.filter((file) =>
-    file.key.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredFiles = files
+    .filter((file) =>
+      file.key.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
+    .sort((a, b) => b.key.localeCompare(a.key));
 
   const getFileIcon = (url: string) => {
     if (isAudio(url)) return <Music className="w-8 h-8 text-blue-500" />;
