@@ -8,7 +8,7 @@
                 {
                     "nombre": "Chicharrón de Cádiz",
                     "precio": "4.00 / 8.00€",
-                    "imagen": "https://cloud.dekorans.es/a0390ca7-9131-4ec9-94c1-36b8c5ed5ffc-imagen-12.jpeg",
+                    "imagen": "https://cloud.dekorans.es/fresca-15-39ce9f55.jpg",
                     "descripcion": "Crujiente piel de cerdo frito con sal marina",
                     "tags": [
                         "frito",
@@ -18,7 +18,7 @@
                 {
                     "nombre": "Queso Payoyo",
                     "precio": "4.50 / 9.00€",
-                    "imagen": "https://cloud.dekorans.es/a0390ca7-9131-4ec9-94c1-36b8c5ed5ffc-imagen-12.jpeg",
+                    "imagen": "https://cloud.dekorans.es/fresca-15-39ce9f55.jpg",
                     "descripcion": "Queso artesanal de la Sierra de Grazalema",
                     "tags": [
                         "queso",
@@ -35,7 +35,7 @@
                 {
                     "nombre": "Tartar de atún trufado",
                     "precio": "14.50€",
-                    "imagen": "https://cloud.dekorans.es/a0390ca7-9131-4ec9-94c1-36b8c5ed5ffc-imagen-12.jpeg",
+                    "imagen": "https://cloud.dekorans.es/fresca-15-39ce9f55.jpg",
                     "descripcion": "Atún rojo fresco con trufa negra y aguacate",
                     "tags": [
                         "fresco",
@@ -45,7 +45,7 @@
                 {
                     "nombre": "Sashimi de atún rojo",
                     "precio": "18.50€",
-                    "imagen": "https://cloud.dekorans.es/a0390ca7-9131-4ec9-94c1-36b8c5ed5ffc-imagen-12.jpeg",
+                    "imagen": "https://cloud.dekorans.es/fresca-15-39ce9f55.jpg",
                     "descripcion": "Láminas finas de atún rojo de primera calidad",
                     "tags": [
                         "sashimi",
@@ -62,7 +62,7 @@
                 {
                     "nombre": "Tarta de queso Payoyo",
                     "precio": "6.50€",
-                    "imagen": "https://cloud.dekorans.es/a0390ca7-9131-4ec9-94c1-36b8c5ed5ffc-imagen-12.jpeg",
+                    "imagen": "https://cloud.dekorans.es/fresca-15-39ce9f55.jpg",
                     "descripcion": "Tarta cremosa con queso artesanal de la región",
                     "tags": [
                         "postre",
