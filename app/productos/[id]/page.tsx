@@ -47,6 +47,7 @@ interface Product {
   };
   videoUrl?: string;
   packs?: BundleTier[];
+  variants?: any[]; // 👈 ESTE ES EL PUTO CAMBIO
 }
 
 export default function ProductPage() {
@@ -192,6 +193,7 @@ export default function ProductPage() {
               currency={product.price.currency}
               basePrice={product.price.current}
               tiers={product.packs || []}
+              variants={product.variants}
             />
           </div>
 

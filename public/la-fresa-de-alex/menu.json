@@ -1,0 +1,75 @@
+{
+    "categorias": [
+        {
+            "id": "clasicos",
+            "nombre": "Lo de tó la vida",
+            "icono": "🍖",
+            "productos": [
+                {
+                    "nombre": "Chicharrón de Cádiz",
+                    "precio": "4.00 / 8.00€",
+                    "imagen": "/chicharron.jpg",
+                    "descripcion": "Crujiente piel de cerdo frito con sal marina",
+                    "tags": [
+                        "frito",
+                        "clásico"
+                    ]
+                },
+                {
+                    "nombre": "Queso Payoyo",
+                    "precio": "4.50 / 9.00€",
+                    "imagen": "/queso-payoyo.jpg",
+                    "descripcion": "Queso artesanal de la Sierra de Grazalema",
+                    "tags": [
+                        "queso",
+                        "artesanal"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "atun",
+            "nombre": "Atún rojo",
+            "icono": "🍣",
+            "productos": [
+                {
+                    "nombre": "Tartar de atún trufado",
+                    "precio": "14.50€",
+                    "imagen": "/atun-tartar.jpg",
+                    "descripcion": "Atún rojo fresco con trufa negra y aguacate",
+                    "tags": [
+                        "fresco",
+                        "gourmet"
+                    ]
+                },
+                {
+                    "nombre": "Sashimi de atún rojo",
+                    "precio": "18.50€",
+                    "imagen": "/atun-sashimi.jpg",
+                    "descripcion": "Láminas finas de atún rojo de primera calidad",
+                    "tags": [
+                        "sashimi",
+                        "premium"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "postres",
+            "nombre": "Postres",
+            "icono": "🍰",
+            "productos": [
+                {
+                    "nombre": "Tarta de queso Payoyo",
+                    "precio": "6.50€",
+                    "imagen": "/tarta-queso.jpg",
+                    "descripcion": "Tarta cremosa con queso artesanal de la región",
+                    "tags": [
+                        "postre",
+                        "queso"
+                    ]
+                }
+            ]
+        }
+    ]
+}

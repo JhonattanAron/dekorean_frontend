@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ImageModal } from "./image-modal";
 import { useImageSelectionStore } from "@/lib/use-image-selector-store";
-import { Trash2, CheckCircle2 } from "lucide-react";
+import { Trash2, CheckCircle2, Sparkles } from "lucide-react";
 import { CreditCounter } from "./credit-counter";
+import { PlacementPromptModal } from "./placement-prompt-modal";
 
 export interface SelectedImageType {
   imageUrl: string;
@@ -45,6 +46,12 @@ export function ProductSidebarInputs({
 }: ProductSidebarInputsProps) {
   const [openModals, setOpenModals] = useState<Record<string, boolean>>({});
   const [placementText, setPlacementText] = useState("");
+  const [promptType, setPromptType] = useState<
+    "panel" | "planta" | "mix" | null
+  >(null);
+  const [showPanel, setShowPanel] = useState(false);
+  const [showPlanta, setShowPlanta] = useState(false);
+  const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [roles, setRoles] = useState<Record<string, string>>({});
 
   const selectedImages = useImageSelectionStore(
@@ -57,12 +64,19 @@ export function ProductSidebarInputs({
   useEffect(() => {
     if (onSelectionChange) {
       const selectedArray = Object.entries(selectedImages)
+        .filter(([categoryId]) => {
+          if (promptType === "panel") return categoryId === "paneles";
+          if (promptType === "planta") return categoryId === "plantas";
+          return true; // mix → deja todo
+        })
         .slice(0, 3)
         .map(([categoryId, img]) => ({
           ...img,
           role:
             roles[categoryId] ||
-            (categoryId === "paneles" ? "panel pared" : "planta decorativa"),
+            (categoryId === "paneles"
+              ? "panel decorativo de pared"
+              : "planta decorativa interior"),
         }));
 
       onSelectionChange({
@@ -97,22 +111,104 @@ export function ProductSidebarInputs({
 
       <CreditCounter />
 
-      {/* 🔥 INPUT DE UBICACIÓN */}
+      {/* 🔥 PLACEMENT PROMPT SECTION */}
       <div className="mt-4 space-y-2">
-        <label className="text-sm text-slate-300 font-semibold">
-          ¿Dónde quieres colocar los elementos?
-        </label>
-        <textarea
-          value={placementText}
-          onChange={(e) => setPlacementText(e.target.value)}
-          placeholder="Ej: Paneles en la pared izquierda, planta en la esquina derecha..."
-          className="w-full h-20 p-3 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-cyan-500"
-        />
+        <div className="flex items-center justify-between">
+          <label className="text-sm text-slate-300 font-semibold">
+            Prompt de ubicación
+          </label>
+          {placementText && (
+            <span className="text-xs text-cyan-400 flex items-center gap-1">
+              <Sparkles className="w-3 h-3" /> Optimizado
+            </span>
+          )}
+        </div>
+        <Button
+          onClick={() => setIsPromptModalOpen(true)}
+          className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-medium"
+        >
+          <Sparkles className="w-4 h-4 mr-2" />
+          {placementText ? "Editar prompt" : "Seleccionar prompt"}
+        </Button>
+        {placementText && (
+          <div className="space-y-3">
+            <div className="p-3 rounded-lg bg-slate-700/50 border border-slate-600/50">
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {placementText}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs text-slate-400">Elementos a agregar:</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowPanel(!showPanel)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
+                    showPanel
+                      ? "bg-blue-500/20 text-blue-300 border-blue-500/50"
+                      : "bg-slate-700/30 text-slate-400 border-slate-600/30 hover:bg-slate-700/50"
+                  }`}
+                >
+                  🧱 Panel
+                </button>
+                <button
+                  onClick={() => setShowPlanta(!showPlanta)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
+                    showPlanta
+                      ? "bg-green-500/20 text-green-300 border-green-500/50"
+                      : "bg-slate-700/30 text-slate-400 border-slate-600/30 hover:bg-slate-700/50"
+                  }`}
+                >
+                  🌿 Planta
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* PLACEMENT PROMPT MODAL */}
+      <PlacementPromptModal
+        isOpen={isPromptModalOpen}
+        onClose={() => setIsPromptModalOpen(false)}
+        onSelect={(prompt, type) => {
+          setPlacementText(prompt);
+          setPromptType(type || "mix");
+          // Automáticamente marcar los badges según el tipo
+          if (type === "panel") {
+            setShowPanel(true);
+            setShowPlanta(false);
+          } else if (type === "planta") {
+            setShowPanel(false);
+            setShowPlanta(true);
+          } else {
+            setShowPanel(true);
+            setShowPlanta(true);
+          }
+        }}
+      />
 
       {/* SCROLL */}
       <div className="flex-1 overflow-y-auto pr-2 space-y-4 mt-4">
-        {CATEGORIES.map((category) => {
+        {!placementText && (
+          <div className="p-4 rounded-lg bg-slate-700/30 border-2 border-dashed border-slate-600/50 text-center">
+            <p className="text-sm text-slate-400">
+              Selecciona un prompt para ver los elementos disponibles
+            </p>
+          </div>
+        )}
+        {placementText && !showPanel && !showPlanta && (
+          <div className="p-4 rounded-lg bg-slate-700/30 border-2 border-dashed border-slate-600/50 text-center">
+            <p className="text-sm text-slate-400">
+              Selecciona Panel o Planta (o ambos) para agregar elementos
+            </p>
+          </div>
+        )}
+        {CATEGORIES.filter((category) => {
+          if (!placementText) return false;
+          if (category.id === "paneles") return showPanel;
+          if (category.id === "plantas") return showPlanta;
+          return false;
+        }).map((category) => {
           const selectedImage = selectedImages[category.id];
           const isSelected = !!selectedImage;
 

@@ -12,6 +12,7 @@ import { AlertCircle, CheckCircle, Save } from "lucide-react";
 import { useToast } from "../ui/use-toast";
 import { Product } from "@/lib/products-store";
 import { VideoSelector } from "./video-selector";
+import { VariantsTab } from "./variants-tab";
 
 interface EditProductProps {
   product: Product;
@@ -137,8 +138,9 @@ export function EditProduct({
 
       {/* TABS */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-7">
           <TabsTrigger value="basico">Básico</TabsTrigger>
+          <TabsTrigger value="variantes">Variantes</TabsTrigger>
           <TabsTrigger value="categorias">Categorías</TabsTrigger>
           <TabsTrigger value="precios">Precios</TabsTrigger>
           <TabsTrigger value="descripcion">Descripción</TabsTrigger>
@@ -152,6 +154,15 @@ export function EditProduct({
               formData={formData}
               onChange={handleFieldChange}
               isLoading={isSaving || isLoading}
+            />
+          </TabsContent>
+          <TabsContent value="variantes">
+            <VariantsTab
+              variants={formData.variants || []}
+              onChange={(variants) => handleFieldChange("variants", variants)}
+              basePrice={formData.price?.current || 0}
+              onImagesChange={(images) => handleFieldChange("images", images)}
+              images={formData.images || []}
             />
           </TabsContent>
 

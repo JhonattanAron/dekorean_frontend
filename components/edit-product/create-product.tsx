@@ -10,6 +10,8 @@ import { DescriptionTab } from "./description-tab";
 import { ImagesTab } from "./images-tab";
 import { Save } from "lucide-react";
 import { ProductCreate } from "@/lib/products-store";
+import { VideoSelector } from "./video-selector";
+import { VariantsTab } from "./variants-tab";
 
 interface CreateProductProps {
   onCreate?: (product: ProductCreate) => Promise<any>;
@@ -155,12 +157,14 @@ export function CreateProduct({
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-7">
           <TabsTrigger value="basico">Básico</TabsTrigger>
+          <TabsTrigger value="variantes">Variantes</TabsTrigger>
           <TabsTrigger value="categorias">Categorías</TabsTrigger>
           <TabsTrigger value="precios">Precios</TabsTrigger>
           <TabsTrigger value="descripcion">Descripción</TabsTrigger>
           <TabsTrigger value="imagenes">Imágenes</TabsTrigger>
+          <TabsTrigger value="videos">Videos</TabsTrigger>
         </TabsList>
 
         <div className="bg-card border rounded-lg p-6 mt-6">
@@ -171,7 +175,15 @@ export function CreateProduct({
               isLoading={isSaving || isLoading}
             />
           </TabsContent>
-
+          <TabsContent value="variantes">
+            <VariantsTab
+              variants={formData.variants || []}
+              onChange={(variants) => handleFieldChange("variants", variants)}
+              basePrice={formData.price?.current || 0}
+              onImagesChange={(images) => handleFieldChange("images", images)}
+              images={formData.images || []}
+            />
+          </TabsContent>
           <TabsContent value="categorias">
             <CategoryTab
               formData={formData}
@@ -198,6 +210,13 @@ export function CreateProduct({
 
           <TabsContent value="imagenes">
             <ImagesTab
+              formData={formData}
+              onChange={handleFieldChange}
+              isLoading={isSaving || isLoading}
+            />
+          </TabsContent>
+          <TabsContent value="videos">
+            <VideoSelector
               formData={formData}
               onChange={handleFieldChange}
               isLoading={isSaving || isLoading}

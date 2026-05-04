@@ -5,6 +5,23 @@ import { create } from "zustand";
 
 // Sub-interfaces basadas en tus sub-schemas
 
+export interface PriceTier {
+  min: number;
+  max?: number;
+  price: number;
+}
+
+export interface Variant {
+  specs: Record<string, any>; // 🔥 dinámico
+
+  sku?: string;
+  stock?: number;
+
+  weight?: string;
+  packaging?: string;
+
+  pricing: PriceTier[];
+}
 export interface Description {
   general: string;
   highlights: string[];
@@ -59,6 +76,7 @@ export interface Product {
   imagesUpdated: boolean;
   videos?: string[];
   mainVideo?: string;
+  variants?: Variant[];
 }
 export interface ProductCreate {
   brand: string;
@@ -86,6 +104,7 @@ export interface ProductCreate {
   title: string;
   createdAt: string;
   updatedAt: string;
+  variants?: Variant[];
   imagesUpdated: boolean;
 }
 
