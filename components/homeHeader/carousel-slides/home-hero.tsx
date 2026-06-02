@@ -5,6 +5,7 @@ import { UploadBox } from "@/components/upload-box";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { CarouselSectionConfig } from "@/app/hooks/use-carousel-config";
 
 const demoImages = [
   {
@@ -17,7 +18,7 @@ const demoImages = [
   },
 ];
 
-export function HomeHero() {
+export function HomeHero({ config }: { config?: CarouselSectionConfig }) {
   const router = useRouter();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [selectedDemo, setSelectedDemo] = useState<number | null>(null);
@@ -84,7 +85,7 @@ export function HomeHero() {
         <img
           alt="Luxury living room with modern wall panels"
           className="w-full h-full object-cover"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoLEMiTicQNt_u-vXfoy-gj_7Zv2SIGbR0qLrUT7zdwAdlNdErf0M6qVLncjFfiN1KHRNBdOwODaMI2zxaYa2BcIGTRqEYFjvXXiOzm3llRydH0zYAycQ-EIaIRAeVVuG9n9wtdEafmUZ6oCfEbOT_H3ZSLibXvp9s_4p9hz_ydp1EdHCMHHozWf9BUBk9nHBauvGhQHj7PNuj-_xHKnKcUPVKGCfgebkDrwG7BLe1OuxYUQj9DKjnFhGY3bIiR8U4I_kz4DEiSw"
+          src={config?.backgroundImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuDoLEMiTicQNt_u-vXfoy-gj_7Zv2SIGbR0qLrUT7zdwAdlNdErf0M6qVLncjFfiN1KHRNBdOwODaMI2zxaYa2BcIGTRqEYFjvXXiOzm3llRydH0zYAycQ-EIaIRAeVVuG9n9wtdEafmUZ6oCfEbOT_H3ZSLibXvp9s_4p9hz_ydp1EdHCMHHozWf9BUBk9nHBauvGhQHj7PNuj-_xHKnKcUPVKGCfgebkDrwG7BLe1OuxYUQj9DKjnFhGY3bIiR8U4I_kz4DEiSw"}
         />
         <motion.div
           className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-800/50 to-slate-900/70"

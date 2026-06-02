@@ -2,15 +2,16 @@
 
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { CarouselSectionConfig } from "@/app/hooks/use-carousel-config";
 
-export function PlantasSlide() {
+export function PlantasSlide({ config }: { config?: CarouselSectionConfig }) {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img
           alt="Plantas artificiales decorativas"
           className="w-full h-full object-cover"
-          src="/carousel/plantas.jpg"
+          src={config?.backgroundImage || "/carousel/plantas.jpg"}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
       </div>

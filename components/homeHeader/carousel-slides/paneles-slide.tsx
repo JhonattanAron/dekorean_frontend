@@ -2,15 +2,16 @@
 
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { CarouselSectionConfig } from "@/app/hooks/use-carousel-config";
 
-export function PanelesSlide() {
+export function PanelesSlide({ config }: { config?: CarouselSectionConfig }) {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img
           alt="Paneles decorativos modernos"
           className="w-full h-full object-cover"
-          src="/carousel/paneles.jpg"
+          src={config?.backgroundImage || "/carousel/paneles.jpg"}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
       </div>

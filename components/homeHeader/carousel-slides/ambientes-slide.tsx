@@ -1,15 +1,16 @@
 'use client';
 
 import { ArrowRight } from 'lucide-react';
+import { CarouselSectionConfig } from "@/app/hooks/use-carousel-config";
 
-export function AmbientesSlide() {
+export function AmbientesSlide({ config }: { config?: CarouselSectionConfig }) {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img
           alt="Ambientes transformados"
           className="w-full h-full object-cover"
-          src="/carousel/ambientes.jpg"
+          src={config?.backgroundImage || "/carousel/ambientes.jpg"}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
       </div>

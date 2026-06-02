@@ -9,20 +9,22 @@ import { PlantasSlide } from "./carousel-slides/plantas-slide";
 import { PersonalizacionSlide } from "./carousel-slides/personalizacion-slide";
 import { AmbientesSlide } from "./carousel-slides/ambientes-slide";
 import { HomeHero } from "./carousel-slides/home-hero";
+import { useCarouselConfig } from "@/app/hooks/use-carousel-config";
 
 const slides = [
-  { id: 0, component: HomeHero, title: "Editor" },
-  { id: 1, component: PanelesSlide, title: "Paneles" },
-  { id: 2, component: CocinaSlide, title: "Cocina" },
-  { id: 3, component: PlantasSlide, title: "Plantas" },
-  { id: 4, component: PersonalizacionSlide, title: "Personalización" },
-  { id: 5, component: AmbientesSlide, title: "Ambientes" },
+  { id: 0, component: HomeHero, title: "Editor", section: "homeHero" },
+  { id: 1, component: PanelesSlide, title: "Paneles", section: "paneles" },
+  { id: 2, component: CocinaSlide, title: "Cocina", section: "cocina" },
+  { id: 3, component: PlantasSlide, title: "Plantas", section: "plantas" },
+  { id: 4, component: PersonalizacionSlide, title: "Personalización", section: "personalizacion" },
+  { id: 5, component: AmbientesSlide, title: "Ambientes", section: "ambientes" },
 ];
 
 export function CarouselContainer() {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isAutoplay, setIsAutoplay] = useState(true);
+  const { config } = useCarouselConfig();
 
   useEffect(() => {
     if (!isAutoplay) return;
@@ -71,7 +73,9 @@ export function CarouselContainer() {
     setTimeout(() => setIsAutoplay(true), 1000);
   };
 
-  const CurrentSlide = slides[current].component;
+  const currentSlideInfo = slides[current];
+  const CurrentSlide = currentSlideInfo.component;
+  const sectionConfig = config[currentSlideInfo.section];
 
   return (
     <div className="relative w-full">
@@ -89,7 +93,7 @@ export function CarouselContainer() {
           }}
           className="w-full"
         >
-          <CurrentSlide />
+          <CurrentSlide config={sectionConfig} />
         </motion.div>
       </AnimatePresence>
 

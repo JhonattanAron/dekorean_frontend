@@ -1,15 +1,16 @@
 'use client';
 
 import { ArrowRight } from 'lucide-react';
+import { CarouselSectionConfig } from "@/app/hooks/use-carousel-config";
 
-export function PersonalizacionSlide() {
+export function PersonalizacionSlide({ config }: { config?: CarouselSectionConfig }) {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img
           alt="Cocina personalizada"
           className="w-full h-full object-cover"
-          src="/carousel/personalizacion.jpg"
+          src={config?.backgroundImage || "/carousel/personalizacion.jpg"}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
       </div>
